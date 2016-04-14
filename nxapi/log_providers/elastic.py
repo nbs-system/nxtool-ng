@@ -6,8 +6,9 @@ from elasticsearch_dsl import Search, Q
 
 class Elastic(object):
     def __init__(self, config_file='config.cfg'):
-        config = ConfigParser.SafeConfigParser()  # TODO add default values
+        config = ConfigParser.SafeConfigParser({'host': '127.0.0.1', 'use_ssl': True, 'index': 'nxapi', 'version': 2})
         config.read(config_file)
+        
         version = config.getint('elastic', 'version')
         index = config.get('elastic', 'index')
         use_ssl = config.getboolean('elastic', 'use_ssl')
