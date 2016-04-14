@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 import urllib3
 urllib3.disable_warnings()
@@ -43,8 +44,13 @@ if args.elastic is True:
     source = elastic.Elastic()
 elif args.flat_file is True:
     source = flat_file
+else:
+    print('Please give me a source.')
+    sys.exit(1)
 
 if args.filter is not None:
     __filter(args.filter)
 elif args.stats:
     statistics.generate_statistics(source)
+else:
+    print('Please five me a valid action to do.')
