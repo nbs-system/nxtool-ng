@@ -1,6 +1,9 @@
 import argparse
 
-from nxapi import filter
+import urllib3
+urllib3.disable_warnings()
+
+from nxapi import filter, statistics
 from nxapi.log_providers import elastic, flat_file
 
 
@@ -29,6 +32,7 @@ def __create_argparser():
     actions.add_argument('--typing', action='store_true')
     actions.add_argument('--whitelist', action='store_true')
     actions.add_argument('--filter', action='store')
+    actions.add_argument('--stats', action='store_true')
 
     return parser.parse_args()
 
@@ -42,3 +46,5 @@ elif args.flat_file is True:
 
 if args.filter is not None:
     __filter(args.filter)
+elif args.stats:
+    statistics.generate_statistics(source)
