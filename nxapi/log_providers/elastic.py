@@ -4,8 +4,10 @@ import collections
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 
+from nxapi.log_providers import LogProvider
 
-class Elastic(object):
+
+class Elastic(LogProvider):
     def __init__(self, config_file='config.cfg'):
         config = ConfigParser.SafeConfigParser({'host': '127.0.0.1', 'use_ssl': True, 'index': 'nxapi', 'version': 2})
         config.read(config_file)
