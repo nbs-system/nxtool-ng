@@ -1,5 +1,6 @@
 import argparse
 import sys
+import shlex
 
 import urllib3
 urllib3.disable_warnings()
