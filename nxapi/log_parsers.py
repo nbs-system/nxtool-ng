@@ -8,7 +8,6 @@ except ImportError:  # python3
 import logging
 import dateutil
 import itertools
-from dateutil.parser import parse
 
 
 def parse_log(line):
