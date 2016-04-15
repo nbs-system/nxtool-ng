@@ -1,0 +1,11 @@
+[run]
+branch = True
+omit = tests/*
+source = nxapi
+
+[report]
+omit =
+    */python?.?/*
+    */site-packages/nose/*
+    *__init__*
+    tests/*
