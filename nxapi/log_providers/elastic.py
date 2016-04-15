@@ -1,4 +1,8 @@
-import ConfigParser
+try:
+    from ConfigParser import SafeConfigParser
+except ImportError:  # python3
+    from configparser import SafeConfigParser as SafeConfigParser
+
 import collections
 
 from elasticsearch import Elasticsearch
@@ -9,7 +13,7 @@ from nxapi.log_providers import LogProvider
 
 class Elastic(LogProvider):
     def __init__(self, config_file='config.cfg'):
-        config = ConfigParser.SafeConfigParser({'host': '127.0.0.1', 'use_ssl': True, 'index': 'nxapi', 'version': 2})
+        config = SafeConfigParser({'host': '127.0.0.1', 'use_ssl': True, 'index': 'nxapi', 'version': 2})
         config.read(config_file)
 
         version = config.getint('elastic', 'version')

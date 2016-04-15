@@ -6,7 +6,7 @@ try:
 except ImportError:  # python3
     from urllib.parse import parse_qs
 import logging
-import dateutil
+from dateutil.parser import parse as parse_date
 import itertools
 
 
@@ -19,7 +19,7 @@ def parse_log(line):
         logging.error('Unable to find [error] or [debug] in the line. Something is wrong with your log.')
         return None
 
-    date = dateutil.parser.parse(line[:end_of_date])
+    date = parse_date(line[:end_of_date])
 
     for keyword in {" NAXSI_FMT: ", " NAXSI_EXLOG: "}:
         start_of_query = line.find(keyword)
@@ -33,7 +33,7 @@ def parse_log(line):
         return None
 
     parsed_data = parse_qs(data)
-    parsed_data = {k:v[0] for k,v in parsed_data.items()}  # parse_qs is returning a dict of list, flatten it!
+    parsed_data = {k: v[0] for k, v in parsed_data.items()}  # parse_qs is returning a dict of list, flatten it!
 
     if 'zone0' in parsed_data:
         for cpt in itertools.count():
