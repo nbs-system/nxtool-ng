@@ -2,7 +2,7 @@ import ConfigParser
 import collections
 
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search, Q, A, aggs
+from elasticsearch_dsl import Search, Q
 
 
 class Elastic(object):
@@ -16,30 +16,36 @@ class Elastic(object):
         host = config.get('elastic', 'host')
 
         self.client = Elasticsearch([host, ], use_ssl=use_ssl, index=index, version=version)
+        self.search = Search(using=self.client, index='nxapi', doc_type='events')
 
-    def get_filtered(self, hostname, filters):
+    def add_filters(self, filters):
         """
-        :param str hostname: The hostname got get intel on
         :param dict filters: What fields/values do we want to filter on?
-        :return:
         """
-        s = Search(using=self.client, index='nxapi', doc_type='events').query('match', server=hostname)
-
         for key, value in filters.items():
             # We need to use multi_match, since we get the fields names dynamically.
-            s = s.query(Q("multi_match", query=value, fields=[key]))
+            self.search = self.search.query(Q("multi_match", query=value, fields=[key]))
 
-        return s.execute()
+    def get_results(self):
+        """
+        Return a `Result` object obtained from the execution of the search `self.search`.
+        This method has a side effect: it re-initialize `self.search`.
+        :return Result: The `Result` object obtained from the execution of the search `self.search`.
+        """
+        result = self.search.execute()
+        self.search = Search(using=self.client, index='nxapi', doc_type='events')
+        return result
 
-    def get_statistics(self, interval=3600):
+    def get_statistics(self):
         ret = collections.defaultdict(dict)
 
         for field in ['uri', 'server', 'zone', 'ip']:
-            s = Search(using=self.client, index='nxapi', doc_type='events')
-            s = s.params(search_type="count")
-            s.aggs.bucket('TEST', 'terms', field=field)
+            self.search = self.search.params(search_type="count")
+            self.search.aggs.bucket('TEST', 'terms', field=field)
 
-            for hit in s.execute().aggregations['TEST']['buckets']:
-                ret[field][str(hit['doc_count'])] = hit['key']
+            for hit in self.search.execute().aggregations['TEST']['buckets']:
+                nb_hits = str(hit['doc_count'])
+                ret[field][nb_hits] = hit['key']
+        self.search = None
 
         return ret
