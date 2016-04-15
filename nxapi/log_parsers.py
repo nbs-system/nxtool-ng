@@ -1,9 +1,12 @@
 # Example of NAXSI_FMT:
 # 2013/11/10 07:36:19 [error] 8278#0: *5932 NAXSI_FMT: ip=X.X.X.X&server=Y.Y.Y.Y&uri=/phpMyAdmin-2.8.2/scripts/setup.php&learning=0&vers=0.52&total_processed=472&total_blocked=204&block=0&cscore0=$UWA&score0=8&zone0=HEADERS&id0=42000227&var_name0=user-agent, client: X.X.X.X, server: blog.memze.ro, request: "GET /phpMyAdmin-2.8.2/scripts/setup.php HTTP/1.1", host: "X.X.X.X"
 
+try:
+    from urlparse import parse_qs
+except ImportError:  # python3
+    from urllib.parse import parse_qs
 import logging
 import dateutil
-import urlparse
 import itertools
 from dateutil.parser import parse
 
@@ -30,7 +33,7 @@ def parse_log(line):
         logging.error('Unable to find NAXSI_EXLOG: or NAXSI_FMT: in the line. Something is wrong with your log.')
         return None
 
-    parsed_data = urlparse.parse_qs(data)
+    parsed_data = parse_qs(data)
     parsed_data = {k:v[0] for k,v in parsed_data.items()}  # parse_qs is returning a dict of list, flatten it!
 
     if 'zone0' in parsed_data:
