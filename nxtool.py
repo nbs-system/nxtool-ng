@@ -35,7 +35,7 @@ def __create_argparser():
 
     log_sources = parser.add_argument_group('Log sources')
     log_sources.add_argument('--elastic', action='store_true')
-    log_sources.add_argument('--flat_file', action='store_true')
+    log_sources.add_argument('--flat-file', action='store_true')
 
     actions = parser.add_argument_group('Actions')
     actions.add_argument('--typing', action='store_true')
@@ -52,7 +52,7 @@ def main():
     if args.elastic is True:
         source = elastic.Elastic()
     elif args.flat_file is True:
-        source = flat_file
+        source = flat_file.FlatFile()
     else:
         print('Please give me a source.')
         return 1

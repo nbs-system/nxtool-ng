@@ -10,5 +10,9 @@ def print_statistics(results):
 
 
 def print_generic(results):
-    for item in results.hits:
+    if hasattr(results, 'hits'):
+        it = results.hits
+    else:
+        it = results
+    for item in it:
         print '\n'.join('%s: %s' % (k, item[k]) for k in item) + '\n'
