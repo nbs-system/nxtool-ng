@@ -7,21 +7,38 @@ from nxapi.log_providers import LogProvider
 class FlatFile(LogProvider):
     def __init__(self, fname='./tests/data/logs.txt'):
         self.logs = list()
+        self.filters = collections.defaultdict(list)
         with open(fname) as f:
             for line in f:
-                self.logs.append(log_parsers.parse_log(line))
+                log = log_parsers.parse_log(line)
+                if log:
+                    self.logs.append(log)
 
     def get_statistics(self):
         ret = collections.defaultdict(dict)
         for field in ['uri', 'server', 'ip']:
-            values = (log[1][field] for log in self.logs)
+            values = (log[1][field] for log in self.__get_filtered_logs())
             for key, value in collections.Counter(values).most_common(10):
                 ret[field][key] = value
         return ret
+
+    def __get_filtered_logs(self):
+        """
+        yield the loglines accordingly to the filtering policy defined in `self.filters`
+        """
+        for log in self.logs:
+            for key, value in log[1].items():
+                if key in self.filters:  # are we filtering on this `key`?
+                    if value in self.filters[key]:  # is the current `value` in the filtering list?
+                        yield log
 
     def get_results(self):
         pass
 
     def add_filters(self, filters):
-        pass
+        """
+        :param dict filters: What fields/values do we want to filter on?
+        """
+        for key, value in filters.items():
+            self.filters[key].append(value)
 
