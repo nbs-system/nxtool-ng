@@ -5,7 +5,12 @@ import urllib3
 urllib3.disable_warnings()
 
 from nxapi import printers
-from nxapi.log_providers import elastic, flat_file
+from nxapi.log_providers import flat_file
+
+try:
+    from nxapi.log_providers import elastic
+except ImportError:
+    print('Unable to correctly import the elastic material. Did you forget to install elasticsearch-dsl?')
 
 
 def __filter(source, filters, hostname=''):
