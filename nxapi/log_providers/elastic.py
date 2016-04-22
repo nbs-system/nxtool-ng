@@ -25,12 +25,20 @@ class Elastic(LogProvider):
         self.search = Search(using=self.client, index='nxapi', doc_type='events')
 
     def add_filters(self, filters):
-        """
-        :param dict filters: What fields/values do we want to filter on?
-        """
         for key, value in filters.items():
             # We need to use multi_match, since we get the fields names dynamically.
             self.search = self.search.query(Q("multi_match", query=value, fields=[key]))
+
+    def _get_top(self, field, size=250):
+        ret = dict()
+
+        self.search = self.search.params(search_type="count")
+        self.search.aggs.bucket('TEST', 'terms', field=field)
+        for hit in self.search.execute().aggregations['TEST']['buckets']:
+            nb_hits = str(hit['doc_count'])
+            ret[nb_hits] = hit['key']
+
+        return ret
 
     def get_results(self):
         """
@@ -42,7 +50,7 @@ class Elastic(LogProvider):
         self.search = Search(using=self.client, index='nxapi', doc_type='events')
         return result
 
-    def get_statistics(self):
+    def get_statisticss(self):
         ret = collections.defaultdict(dict)
 
         for field in ['uri', 'server', 'zone', 'ip']:

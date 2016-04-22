@@ -9,4 +9,10 @@ class LogProvider(object):
         raise NotImplementedError
 
     def get_statistics(self):
+        ret = dict()
+        for field in ['uri', 'server', 'ip']:
+            ret[field] = self._get_top(field)
+        return ret
+
+    def _get_top(self, field, size=250):
         raise NotImplementedError

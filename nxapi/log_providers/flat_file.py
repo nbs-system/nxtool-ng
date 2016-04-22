@@ -14,23 +14,26 @@ class FlatFile(LogProvider):
                 if log:
                     self.logs.append(log)
 
-    def get_statistics(self):
-        ret = collections.defaultdict(dict)
-        for field in ['uri', 'server', 'ip']:
-            values = (log[1][field] for log in self.__get_filtered_logs())
-            for key, value in collections.Counter(values).most_common(10):
-                ret[field][key] = value
+    def _get_top(self, field, size=250):
+        ret = dict()
+        values = (log[1][field] for log in self.__get_filtered_logs())
+        for key, value in collections.Counter(values).most_common(10):
+            ret[key] = value
         return ret
 
     def __get_filtered_logs(self):
         """
         yield the loglines accordingly to the filtering policy defined in `self.filters`
         """
-        for log in self.logs:
-            for key, value in log[1].items():
-                if key in self.filters:  # are we filtering on this `key`?
-                    if value in self.filters[key]:  # is the current `value` in the filtering list?
-                        yield log
+        if not self.filters:  # we don't filter, give everything!
+            for log in self.logs:
+                yield log
+        else:
+            for log in self.logs:
+                for key, value in log[1].items():
+                    if key in self.filters:  # are we filtering on this `key`?
+                        if value in self.filters[key]:  # is the current `value` in the filtering list?
+                            yield log
 
     def get_results(self):
         pass
