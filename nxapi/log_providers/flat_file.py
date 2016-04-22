@@ -39,9 +39,6 @@ class FlatFile(LogProvider):
         pass
 
     def add_filters(self, filters):
-        """
-        :param dict filters: What fields/values do we want to filter on?
-        """
         for key, value in filters.items():
             self.filters[key].append(value)
 
