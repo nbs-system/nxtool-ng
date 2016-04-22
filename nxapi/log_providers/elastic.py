@@ -40,7 +40,7 @@ class Elastic(LogProvider):
 
         return ret
 
-    def get_results(self):
+    def _get_results(self):
         """
         Return a `Result` object obtained from the execution of the search `self.search`.
         This method has a side effect: it re-initialize `self.search`.
@@ -50,16 +50,3 @@ class Elastic(LogProvider):
         self.search = Search(using=self.client, index='nxapi', doc_type='events')
         return result
 
-    def get_statisticss(self):
-        ret = collections.defaultdict(dict)
-
-        for field in ['uri', 'server', 'zone', 'ip']:
-            self.search = self.search.params(search_type="count")
-            self.search.aggs.bucket('TEST', 'terms', field=field)
-
-            for hit in self.search.execute().aggregations['TEST']['buckets']:
-                nb_hits = str(hit['doc_count'])
-                ret[field][nb_hits] = hit['key']
-        self.search = None
-
-        return ret

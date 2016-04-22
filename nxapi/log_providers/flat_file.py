@@ -35,7 +35,7 @@ class FlatFile(LogProvider):
                         if value in self.filters[key]:  # is the current `value` in the filtering list?
                             yield log
 
-    def get_results(self):
+    def _get_results(self):
         pass
 
     def add_filters(self, filters):

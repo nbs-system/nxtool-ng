@@ -5,7 +5,7 @@ class LogProvider(object):
         """
         raise NotImplementedError
 
-    def get_results(self):
+    def _get_results(self):
         raise NotImplementedError
 
     def get_statistics(self):
