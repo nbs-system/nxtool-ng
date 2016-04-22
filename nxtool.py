@@ -9,8 +9,10 @@ from nxapi.log_providers import flat_file
 
 try:
     from nxapi.log_providers import elastic
+    elastic_imported = True
 except ImportError:
     print('Unable to correctly import the elastic material. Did you forget to install elasticsearch-dsl?')
+    elastic_imported = False
 
 
 def __filter(source, filters, hostname=''):
@@ -54,11 +56,14 @@ def main():
     args = __create_argparser()
 
     if args.elastic is True:
+        if elastic_imported is False:
+            print('You asked for an elastic source, but you do not have the required dependencies.')
+            return
         source = elastic.Elastic()
     elif args.flat_file is True:
         source = flat_file.FlatFile()
     else:
-        print('Please give me a source.')
+        print('Please give me a valid source.')
         return 1
 
     __filter(source, args.filter, args.hostname)  # Filtering can be used for any operation
