@@ -61,7 +61,7 @@ def main():
     if args.stats:
         printers.print_statistics(source.get_statistics())
     else:
-        print(printers.print_generic(source.get_results()))
+        print(printers.print_generic(source._get_results()))
 
 
 if __name__ == '__main__':

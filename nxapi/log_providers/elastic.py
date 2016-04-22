@@ -3,8 +3,6 @@ try:
 except ImportError:  # python3
     from configparser import ConfigParser
 
-import collections
-
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 
