@@ -1,5 +1,7 @@
 import collections
 import fileinput
+import mimetypes
+import zipfile
 
 from nxapi import log_parsers
 from nxapi.log_providers import LogProvider
@@ -10,7 +12,20 @@ class FlatFile(LogProvider):
         self.logs = list()
         self.filters = collections.defaultdict(list)
 
-        for line in fileinput.input(fname):
+        try:
+            ftype = mimetypes.guess_all_extensions(fname)[0]
+        except AttributeError:  #  `fname` is None
+            self.__transform_logs(fileinput.input(fname))
+        except IndexError:  # `fname` has no guessable mimtype
+            self.__transform_logs(fileinput.input(fname))
+        else:
+            if ftype == 'application/zip': # zip file!
+                with zipfile.ZipFile(fname) as f:
+                    for name in f.namelist():
+                        self.__transform_logs(f.read(name))
+
+    def __transform_logs(self, it):
+        for line in it:
             log = log_parsers.parse_log(line)
             if log:
                 self.logs.append(log)
