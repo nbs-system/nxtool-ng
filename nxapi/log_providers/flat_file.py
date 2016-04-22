@@ -1,4 +1,5 @@
 import collections
+import fileinput
 
 from nxapi import log_parsers
 from nxapi.log_providers import LogProvider
@@ -8,11 +9,11 @@ class FlatFile(LogProvider):
     def __init__(self, fname='./tests/data/logs.txt'):
         self.logs = list()
         self.filters = collections.defaultdict(list)
-        with open(fname) as f:
-            for line in f:
-                log = log_parsers.parse_log(line)
-                if log:
-                    self.logs.append(log)
+
+        for line in fileinput.input(fname):
+            log = log_parsers.parse_log(line)
+            if log:
+                self.logs.append(log)
 
     def _get_top(self, field, size=250):
         ret = dict()
