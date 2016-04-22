@@ -2,6 +2,7 @@ import collections
 import fileinput
 import mimetypes
 import zipfile
+import tarfile
 
 from nxapi import log_parsers
 from nxapi.log_providers import LogProvider
@@ -21,6 +22,10 @@ class FlatFile(LogProvider):
         else:
             if ftype == 'application/zip': # zip file!
                 with zipfile.ZipFile(fname) as f:
+                    for name in f.namelist():
+                        self.__transform_logs(f.read(name))
+            elif ftype == 'application/tar':  # tar file!
+                with tarfile.open(fname) as f:
                     for name in f.namelist():
                         self.__transform_logs(f.read(name))
 
