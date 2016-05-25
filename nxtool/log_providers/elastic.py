@@ -1,6 +1,6 @@
 from __future__ import print_function
 import math
-import collections
+import logging
 import operator
 
 try:  # Fuck you guido for removing reduce
@@ -83,7 +83,8 @@ class Elastic(LogProvider):
                     s1 += uri['doc_count']
                     s2 += uri['doc_count'] * uri['doc_count']
                 if s0 < 10:
-                    print('The id %s is present in %d %s, classifying it as non-significant.' % (id_bucket.key, s0, field))
+                    logging.debug('The id %s is present in %d %s, classifying it as non-significant.', id_bucket.key,
+                                  s0, field)
                     continue
 
                 try:  # magic formula to compute the coefficient of variation
@@ -93,8 +94,8 @@ class Elastic(LogProvider):
                 except ZeroDivisionError:
                     std_dev = 0.0
                 if std_dev < 10:  # 10% of deviation max
-                    print('The id %s appeared on %d %s, with a coefficient of variation of %d%%.' %
-                          (id_bucket.key, s0, field, std_dev))
+                    logging.debug('The id %s appeared on %d %s, with a coefficient of variation of %d%%.',
+                                  id_bucket.key, s0, field, std_dev)
                     continue
             ids.append(id_bucket.key)
 
@@ -108,51 +109,6 @@ class Elastic(LogProvider):
 
         self.search = search
         return ret
-
-    def _filter_cookies(self):
-        """ This is a global filter for cookies.
-
-        """
-        search = self.search
-
-        # We're only interested in the COOKIES zone
-        self.search = self.search.query(Q("multi_match", query='HEADERS', fields=['zone']))
-        self.__get_top_by_id_dict(['uri', 'peer'])
-
-        self.search = search
-        return
-
-    def _filter_images_1002(self, fields=None):
-        search = self.search.to_dict()
-        self.search = self.search.query(Q("multi_match", query='URL', fields=['zone']))
-        self.search = self.search.query(Q("multi_match", query='1002', fields=['id']))
-        self.search.aggs.bucket('uris', 'terms', field='uri', size=25)
-        result = self.search.execute()
-        self.search = search
-        return
-
-    def get_relevents_events(self, zone=''):
-        search = self.search.to_dict()
-
-        zones = {}
-        self.search.aggs.bucket('zones', 'terms', field='zone')
-        for zone in self.search.execute().aggregations['zones']['buckets']:
-            zones[zone['key']] = zone['doc_count']
-
-        print(zones)
-
-        for zone in zones:
-            self.search = Search(using=self.client, index='nxapi', doc_type='events')
-            self.search.from_dict(search)
-            self.search = self.search.query(Q("multi_match", query=zone, fields=['zone']))
-
-            self.search.aggs.bucket('uris', 'terms', field='uri')
-            for uri in self.search.execute().aggregations['uris']['buckets']:
-                print(uri)
-            #self.search.aggs.bucket('var_a', 'terms', field='var_name')
-            res = self.search.execute()
-            print(res)
-        #for z in ('HEADERS', 'URL', 'BODY', 'ARGS'):
 
     def _get_results(self):
         """
