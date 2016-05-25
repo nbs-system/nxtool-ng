@@ -10,7 +10,7 @@ except ImportError:  # python3
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q, A
 
-from nxapi.log_providers import LogProvider
+from nxtool.log_providers import LogProvider
 
 
 class Elastic(LogProvider):

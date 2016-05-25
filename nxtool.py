@@ -8,7 +8,7 @@ from nxtool import printers
 from nxtool.log_providers import flat_file
 
 try:
-    from nxapi.log_providers import elastic
+    from nxtool.log_providers import elastic
     elastic_imported = True
 except ImportError:
     print('Unable to correctly import the elastic material. Did you forget to install elasticsearch-dsl?')
