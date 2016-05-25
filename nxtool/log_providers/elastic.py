@@ -1,6 +1,12 @@
 from __future__ import print_function
 import math
 import collections
+import operator
+
+try:  # Fuck you guido for removing reduce
+    from functools import reduce
+except ImportError:
+    pass
 
 try:
     from ConfigParser import SafeConfigParser as ConfigParser
@@ -8,7 +14,7 @@ except ImportError:  # python3
     from configparser import ConfigParser
 
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search, Q, A
+from elasticsearch_dsl import Search, Q, MultiSearch
 
 from nxtool.log_providers import LogProvider
 
@@ -26,10 +32,18 @@ class Elastic(LogProvider):
         self.client = Elasticsearch([host, ], use_ssl=use_ssl, index=index, version=version)
         self.search = Search(using=self.client, index='nxapi', doc_type='events')
 
+    def reset_filters(self):
+        self.search = Search(using=self.client, index='nxapi', doc_type='events')
+
     def add_filters(self, filters):
+        # We need to use multi_match, since we get the fields names dynamically.
         for key, value in filters.items():
-            # We need to use multi_match, since we get the fields names dynamically.
-            self.search = self.search.query(Q("multi_match", query=value, fields=[key]))
+            if isinstance(value, list):
+                self.search = self.search.query(
+                    reduce(operator.or_, [Q('multi_match', query=v, fields=[key]) for v in value])
+                )
+            else:
+                self.search = self.search.query(Q("multi_match", query=value, fields=[key]))
 
     def _get_top(self, field, size=250):
         ret = dict()
@@ -42,7 +56,7 @@ class Elastic(LogProvider):
 
         return ret
 
-    def __get_top_by_id_dict(self, fields):
+    def get_relevant_ids(self, fields):
         """
          We want to keep alerts that are:
             - spread over a vast number of urls
@@ -52,7 +66,8 @@ class Elastic(LogProvider):
         :param list of str fields:
         :return:
         """
-        ret = collections.defaultdict(list)
+        search = self.search
+        ids = list()
 
         self.search.aggs.bucket('ids', 'terms', field='id', size=250)
         for field in fields:
@@ -70,6 +85,7 @@ class Elastic(LogProvider):
                 if s0 < 10:
                     print('The id %s is present in %d %s, classifying it as non-significant.' % (id_bucket.key, s0, field))
                     continue
+
                 try:  # magic formula to compute the coefficient of variation
                     std_dev = math.sqrt((s0 * s2 - s1 * s1) / (s0 * (s0 - 1)))
                     std_dev /= (s1 / s0)
@@ -79,6 +95,19 @@ class Elastic(LogProvider):
                 if std_dev < 10:  # 10% of deviation max
                     print('The id %s appeared on %d %s, with a coefficient of variation of %d%%.' %
                           (id_bucket.key, s0, field, std_dev))
+                    continue
+            ids.append(id_bucket.key)
+
+        self.search = search
+        ret = dict()
+        for _id in ids:
+            self.add_filters({'id': _id})
+            answer = self.search.execute()
+            ret[_id] = answer.hits.hits
+            self.search = search
+
+        self.search = search
+        return ret
 
     def _filter_cookies(self):
         """ This is a global filter for cookies.
@@ -101,8 +130,6 @@ class Elastic(LogProvider):
         result = self.search.execute()
         self.search = search
         return
-
-
 
     def get_relevents_events(self, zone=''):
         search = self.search.to_dict()

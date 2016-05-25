@@ -6,6 +6,7 @@ urllib3.disable_warnings()
 
 from nxtool import printers
 from nxtool.log_providers import flat_file
+from nxtool.whitelists_generators import cookies
 
 try:
     from nxtool.log_providers import elastic
@@ -75,7 +76,7 @@ def main():
     if args.stats:
         printers.print_statistics(source.get_statistics())
     elif args.whitelist:
-        source._filter_cookies()
+        print(cookies.generate_whitelist(source))
         source._filter_images_1002()
         #source.get_relevents_events('BODY')
     else:
