@@ -4,8 +4,9 @@ import mimetypes
 import zipfile
 import tarfile
 
-from nxapi import log_parsers
-from nxapi.log_providers import LogProvider
+from nxapi.nxlog import parse_nxlog
+
+from nxtool.log_providers import LogProvider
 
 
 class FlatFile(LogProvider):
@@ -31,12 +32,14 @@ class FlatFile(LogProvider):
 
     def __transform_logs(self, it):
         for line in it:
-            log = log_parsers.parse_log(line)
+            log = parse_nxlog(line)
             if log:
                 self.logs.append(log)
 
     def _get_top(self, field, size=250):
         ret = dict()
+        if field == 'zone':
+            field = 'zone0'
         values = (log[1][field] for log in self.__get_filtered_logs())
         for key, value in collections.Counter(values).most_common(10):
             ret[key] = value

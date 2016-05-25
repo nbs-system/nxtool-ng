@@ -1,6 +1,6 @@
 import unittest
 
-from nxapi.log_providers import flat_file
+from nxtool.log_providers import flat_file
 
 
 class TestParseLog(unittest.TestCase):

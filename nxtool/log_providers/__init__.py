@@ -14,7 +14,7 @@ class LogProvider(object):
         :return a dict of dict of int:
         """
         ret = dict()
-        for field in ['uri', 'server', 'ip']:
+        for field in ['uri', 'server', 'ip', 'zone']:
             ret[field] = self._get_top(field)
         return ret
 

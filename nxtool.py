@@ -4,8 +4,8 @@ import sys
 import urllib3
 urllib3.disable_warnings()
 
-from nxapi import printers
-from nxapi.log_providers import flat_file
+from nxtool import printers
+from nxtool.log_providers import flat_file
 
 try:
     from nxapi.log_providers import elastic
@@ -74,6 +74,10 @@ def main():
 
     if args.stats:
         printers.print_statistics(source.get_statistics())
+    elif args.whitelist:
+        source._filter_cookies()
+        source._filter_images_1002()
+        #source.get_relevents_events('BODY')
     else:
         print(printers.print_generic(source._get_results()))
 
