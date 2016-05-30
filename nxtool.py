@@ -1,5 +1,6 @@
 import argparse
 import sys
+import logging
 
 import urllib3
 urllib3.disable_warnings()
@@ -39,6 +40,7 @@ def __create_argparser():
     parser = argparse.ArgumentParser(description='Sweet tool to help you managing your naxsi logs.')
 
     parser.add_argument('hostname', action='store', nargs='?')
+    parser.add_argument('--verbose', action='store_true')
 
     log_sources = parser.add_argument_group('Log sources')
     log_sources.add_argument('--elastic', action='store_true')
@@ -57,6 +59,11 @@ def __create_argparser():
 
 def main():
     args = __create_argparser()
+
+    if args.verbose:
+        logging.getLogger("elasticsearch").setLevel(logging.ERROR)
+        logging.getLogger("urllib3").setLevel(logging.ERROR)
+        logging.basicConfig(level=logging.DEBUG)
 
     if args.elastic is True:
         if elastic_imported is False:

@@ -58,9 +58,7 @@ class Elastic(LogProvider):
 
     def get_relevant_ids(self, fields):
         """
-         We want to keep alerts that are:
-            - spread over a vast number of urls
-            - affecting a significant part of users
+         We want to keep alerts that are spread over a vast number of different`fields`
 
             To measure the spreading, we're using this metric: https://en.wikipedia.org/wiki/Coefficient_of_variation
         :param list of str fields:

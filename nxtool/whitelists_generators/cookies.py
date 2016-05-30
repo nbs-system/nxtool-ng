@@ -1,5 +1,6 @@
 from . import modify_search
 
+
 @modify_search
 def generate_whitelist(provider):
     """
