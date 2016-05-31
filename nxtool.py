@@ -2,12 +2,11 @@ import argparse
 import sys
 import logging
 
-import urllib3
-urllib3.disable_warnings()
-
 from nxtool import printers
 from nxtool.log_providers import flat_file
 from nxtool.whitelists_generators import cookies, images_1002
+
+WL_MODULES = [cookies, images_1002]
 
 try:
     from nxtool.log_providers import elastic
@@ -83,8 +82,10 @@ def main():
     if args.stats:
         printers.print_statistics(source.get_statistics())
     elif args.whitelist:
-        print(cookies.generate_whitelist(source))
-        print(images_1002.generate_whitelist(source))
+        whitelist = list()
+        for module in WL_MODULES:
+            whitelist.extend(module.generate_whitelist(source, whitelist))
+        print(whitelist)
     else:
         print(printers.print_generic(source._get_results()))
 

@@ -32,9 +32,6 @@ class Elastic(LogProvider):
         self.client = Elasticsearch([host, ], use_ssl=use_ssl, index=index, version=version)
         self.search = Search(using=self.client, index='nxapi', doc_type='events')
 
-    def reset_filters(self):
-        self.search = Search(using=self.client, index='nxapi', doc_type='events')
-
     def add_filters(self, filters):
         # We need to use multi_match, since we get the fields names dynamically.
         for key, value in filters.items():
@@ -117,4 +114,3 @@ class Elastic(LogProvider):
         result = self.search.scan()
         self.search = Search(using=self.client, index='nxapi', doc_type='events')
         return result
-
