@@ -69,5 +69,5 @@ def generate_whitelist(provider, whitelists):
     rules = []
     for url, nb in best_path.items():
         logging.info('The url "%s" triggered %d exceptions for the rule 1002, whitelisting it.' % (url, nb))
-        rules.append('BasicRule wl:1002 "mz:%s";' % url)
+        rules.append('BasicRule wl:1002 "mz:$URL_X:^%s|URL";' % url)
     return rules
