@@ -1,5 +1,3 @@
-import itertools
-
 from . import modify_search
 from nxapi import whitelist
 
@@ -11,7 +9,7 @@ def generate_whitelist(provider, whitelists):
     :param provider:
     :return:
     """
-    provider.add_filters({'zone': 'HEADERS'})
+    provider.add_filters({'zone': 'HEADERS', 'var_name': 'cookie'})
     data = provider.get_relevant_ids(['uri', 'peer'])
 
     # Filter already whitelisted things
