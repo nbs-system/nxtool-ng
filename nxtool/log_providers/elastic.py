@@ -78,8 +78,9 @@ class Elastic(LogProvider):
                     s1 += uri['doc_count']
                     s2 += uri['doc_count'] * uri['doc_count']
                 if s0 < 10:
-                    logging.debug('The id %s is present in %d %s, classifying it as non-significant.', id_bucket.key,
-                                  s0, field)
+                    if s0:  # we don't care about zero
+                        logging.debug('The id %s is present in %d %s, classifying it as non-significant.', id_bucket.key,
+                                      s0, field)
                     continue
 
                 try:  # magic formula to compute the coefficient of variation

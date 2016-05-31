@@ -1,3 +1,7 @@
+import urllib3
+urllib3.disable_warnings()
+
+
 import argparse
 import sys
 import logging
