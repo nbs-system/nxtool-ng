@@ -8,7 +8,6 @@ except ImportError:  # python 2
     from itertools import izip_longest
 
 from . import modify_search
-from nxapi import whitelist
 
 
 def __guess_prefixes(strings):
@@ -48,7 +47,7 @@ def generate_whitelist(provider, whitelists):
 
     # Filter already whitelisted things
     already_whitelisted_uri = set()
-    for _, _, r in map(whitelist.parse, whitelists):
+    for r in whitelists:
         if 'URL' in r['mz'] and 1002 in r['wl']:
             already_whitelisted_uri.union(r['mz'])
     uris = {nb: uri for (nb, uri) in uris.items() if uri not in already_whitelisted_uri}  # TODO less stoopid filtering
@@ -69,5 +68,5 @@ def generate_whitelist(provider, whitelists):
     rules = []
     for url, nb in best_path.items():
         logging.info('The url "%s" triggered %d exceptions for the rule 1002, whitelisting it.' % (url, nb))
-        rules.append('BasicRule wl:1002 "mz:$URL_X:^%s|URL";' % url)
+        rules.append({'wl': [1002], 'mz': ['$URL_X:^%s|URL' % url]})
     return rules

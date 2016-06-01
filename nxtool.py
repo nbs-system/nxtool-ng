@@ -6,6 +6,8 @@ import argparse
 import sys
 import logging
 
+from nxapi import whitelist as nxapi_whitelist
+
 from nxtool import printers
 from nxtool.log_providers import flat_file
 from nxtool.whitelists_generators import cookies, images_1002
@@ -89,7 +91,7 @@ def main():
         whitelist = list()
         for module in WL_MODULES:
             whitelist.extend(module.generate_whitelist(source, whitelist))
-        print(whitelist)
+        print(map(nxapi_whitelist.dict_to_str,  whitelist))
     else:
         print(printers.print_generic(source._get_results()))
 
