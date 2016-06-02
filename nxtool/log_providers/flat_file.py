@@ -37,11 +37,11 @@ class FlatFile(LogProvider):
             if log:
                 self.logs.append(log)
 
-    def _get_top(self, field, size=250):
+    def get_top(self, field, size=250):
         ret = dict()
         if field == 'zone':
             field = 'zone0'
-        values = (log[1][field] for log in self.__get_filtered_logs())
+        values = (log[field] for log in self.__get_filtered_logs())
         for key, value in collections.Counter(values).most_common(10):
             ret[key] = value
         return ret
@@ -60,7 +60,7 @@ class FlatFile(LogProvider):
                         if value in self.filters[key]:  # is the current `value` in the filtering list?
                             yield log
 
-    def _get_results(self):
+    def get_results(self):
         return self.__get_filtered_logs()
 
     def add_filters(self, filters):
@@ -84,7 +84,7 @@ class FlatFile(LogProvider):
         for field in fields:
             stats = collections.defaultdict(int)
             size = 0
-            for logline in self._get_results():
+            for logline in self.get_results():
                 if logline['id0'] not in id_blacklist:
                     stats[logline['id0']] += 1
                 size += 1

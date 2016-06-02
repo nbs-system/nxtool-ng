@@ -5,7 +5,7 @@ class LogProvider(object):
         """
         raise NotImplementedError
 
-    def _get_results(self):
+    def get_results(self):
         raise NotImplementedError
 
     def get_statistics(self):
@@ -15,10 +15,10 @@ class LogProvider(object):
         """
         ret = dict()
         for field in ['uri', 'server', 'ip', 'zone']:
-            ret[field] = self._get_top(field)
+            ret[field] = self.get_top(field)
         return ret
 
-    def _get_top(self, field, size=250):
+    def get_top(self, field, size=250):
         """ Get the top values on a given `field`.
 
         :param str field: On what field we want to filter
