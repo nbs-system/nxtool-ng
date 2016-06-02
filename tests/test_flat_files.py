@@ -12,4 +12,4 @@ class TestParseLog(unittest.TestCase):
     def test_generate_whitelist(self):
         parser = flat_file.FlatFile('./tests/data/cookies.txt')
         self.assertEqual(cookies.generate_whitelist(parser, []), [{'wl': [42000227], 'mz':['$HEADERS_VAR:cookie']}])
-        self.assertEqual(cookies.generate_whitelist(parser, [{'mz': [42000227]}]), [{'wl': [42000227], 'mz':['$HEADERS_VAR:cookie']}])
+        self.assertEqual(cookies.generate_whitelist(parser, [{'wl': [42000227]}]), [])

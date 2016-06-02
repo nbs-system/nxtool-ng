@@ -16,8 +16,8 @@ def generate_whitelist(provider, whitelists):
     # Filter already whitelisted things
     already_whitelisted_id = set()
     for r in whitelists:
-        if 'HEADERS:Cookie' in r['mz']:
-            already_whitelisted_id.union(r['wl'])
-    wid = [int(wid) for wid in data if wid not in already_whitelisted_id]
+        if 'mz' not in r or'HEADERS:Cookie' in r['mz']:
+            already_whitelisted_id = already_whitelisted_id.union(r['wl'])
+    wid = [int(wid) for wid in data if int(wid) not in already_whitelisted_id]
 
     return list() if not wid else [{'mz': ['$HEADERS_VAR:cookie'], 'wl': wid}, ]
