@@ -41,7 +41,7 @@ def __guess_prefixes(strings):
 def generate_whitelist(provider, whitelists):
     provider.add_filters({'zone': 'URL', 'id': '1002'})
 
-    uris = provider._get_top('uri')
+    uris = provider.get_top('uri')
     if not uris:
         return []
 

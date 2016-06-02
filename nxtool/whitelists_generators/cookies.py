@@ -1,3 +1,5 @@
+import logging
+
 from . import modify_search
 
 
@@ -18,4 +20,4 @@ def generate_whitelist(provider, whitelists):
             already_whitelisted_id.union(r['wl'])
     wid = [int(wid) for wid in data if wid not in already_whitelisted_id]
 
-    return list() if not wid else [{'mz': '$HEADERS_VAR:cookie', 'wl': wid}, ]
+    return list() if not wid else [{'mz': ['$HEADERS_VAR:cookie'], 'wl': wid}, ]

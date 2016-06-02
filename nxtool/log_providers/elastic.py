@@ -1,7 +1,7 @@
 from __future__ import print_function
-import math
 import logging
 import operator
+import collections
 
 try:  # Fuck you guido for removing reduce
     from functools import reduce
@@ -30,7 +30,7 @@ class Elastic(LogProvider):
         host = config.get('elastic', 'host')
 
         self.client = Elasticsearch([host, ], use_ssl=use_ssl, index=index, version=version)
-        self.search = Search(using=self.client, index='nxapi', doc_type='events')
+        self.search = Search(using=self.client, index='nxapi', doc_type='events').extra(size=10000)
 
     def add_filters(self, filters):
         # We need to use multi_match, since we get the fields names dynamically.
@@ -42,7 +42,7 @@ class Elastic(LogProvider):
             else:
                 self.search = self.search.query(Q("multi_match", query=value, fields=[key]))
 
-    def _get_top(self, field, size=250):
+    def get_top(self, field, size=250):
         ret = dict()
 
         self.search = self.search.params(search_type="count")
@@ -54,64 +54,35 @@ class Elastic(LogProvider):
         return ret
 
     def get_relevant_ids(self, fields):
-        """
-         We want to keep alerts that are spread over a vast number of different`fields`
-
-            To measure the spreading, we're using this metric: https://en.wikipedia.org/wiki/Coefficient_of_variation
-        :param list of str fields:
-        :return:
-        """
-        search = self.search
-        ids = list()
-
-        self.search.aggs.bucket('ids', 'terms', field='id', size=250)
+        id_blacklist = set()
+        ret = set()
         for field in fields:
-            self.search.aggs['ids'].bucket(field + 's', 'terms', field=field, size=10)
+            stats = collections.defaultdict(int)
+            size = 0
+            for logline in self.search.execute():
+                if logline['id'] not in id_blacklist:
+                    stats[logline['id']] += 1
+                size += 1.0
 
-        result = self.search.execute()
-        id_buckets = result.aggregations['ids'].buckets
-        for id_bucket in id_buckets:
-            for field in fields: # FIXME if an ID is unevenly reparteed, ditch it.
-                s0, s1, s2 = 0.0, 0.0, 0.0
-                for uri in id_bucket.__getattr__(field + 's').buckets:
-                    s0 += 1.0
-                    s1 += uri['doc_count']
-                    s2 += uri['doc_count'] * uri['doc_count']
-                if s0 < 10:
-                    if s0:  # we don't care about zero
-                        logging.debug('The id %s is present in %d %s, classifying it as non-significant.', id_bucket.key,
-                                      s0, field)
-                    continue
+            for k, v in stats.items():
+                if v / size < 0.10:
+                    logging.info('The id %s is present in less than 10%% (%f) of %s : non-significant.', k, v / size, field)
+                    id_blacklist.add(k)
+                else:
+                    ret.add(k)
 
-                try:  # magic formula to compute the coefficient of variation
-                    std_dev = math.sqrt((s0 * s2 - s1 * s1) / (s0 * (s0 - 1)))
-                    std_dev /= (s1 / s0)
-                    std_dev *= 100
-                except ZeroDivisionError:
-                    std_dev = 0.0
-                if std_dev < 10:  # 10% of deviation max
-                    logging.debug('The id %s appeared on %d %s, with a coefficient of variation of %d%%.',
-                                  id_bucket.key, s0, field, std_dev)
-                    continue
-            ids.append(id_bucket.key)
+        return list(ret)
 
-        self.search = search
-        ret = dict()
-        for _id in ids:
-            self.add_filters({'id': _id})
-            answer = self.search.execute()
-            ret[_id] = answer.hits.hits
-            self.search = search
+    def reset_filters(self):
+        self.search = Search(using=self.client, index='nxapi', doc_type='events').extra(size=10000)
 
-        self.search = search
-        return ret
-
-    def _get_results(self):
+    def get_results(self):
         """
         Return a `Result` object obtained from the execution of the search `self.search`.
         This method has a side effect: it re-initialize `self.search`.
         :return Result: The `Result` object obtained from the execution of the search `self.search`.
         """
+        search = self.search
         result = self.search.scan()
-        self.search = Search(using=self.client, index='nxapi', doc_type='events')
+        self.search = search
         return result
