@@ -1,4 +1,5 @@
 import logging
+import os
 
 import collections
 
@@ -18,8 +19,8 @@ def __guess_prefixes(strings):
     :param list of list of str strings: [['wp-content', '10'], ['pouet', pif']]
     :return dict: {url1:nb_url1, url2: nb_url2, ...}
     """
-    if len(strings) < 2:
-        return {strings: 1}
+    if len(strings) == 1:
+        return [('/' + os.path.join(*strings[0]), 1), ]
 
     threshold = len(strings)
     prefix, prefixes = [], []
@@ -48,20 +49,29 @@ def generate_whitelist(provider, whitelists):
     # Filter already whitelisted things
     already_whitelisted_uri = set()
     for r in whitelists:
-        if 'URL' in r['mz'] and 1002 in r['wl']:
-            already_whitelisted_uri.union(r['mz'])
-    uris = {nb: uri for (nb, uri) in uris.items() if uri not in already_whitelisted_uri}  # TODO less stoopid filtering
+        if 1002 in r['wl']:
+            if 'mz' not in r:
+                already_whitelisted_uri = already_whitelisted_uri.union('/')
+                break
+            elif 'URL' in r['mz'] :
+                already_whitelisted_uri = already_whitelisted_uri.union(r['mz'])
 
-    if not uris:
+    res = dict()
+    for uri, nb in uris.items():
+        if not any(uri.startswith(i) for i in already_whitelisted_uri):
+           res[uri] = nb
+    #uris = {nb: uri for (nb, uri) in uris.items() if not any(uri.startswith(i) for i in already_whitelisted_uri)}
+
+    if not res:
         return []
 
-    prefixes = __guess_prefixes([a.split('/')[1:] for a in uris.values()])
+    prefixes = __guess_prefixes([a.split('/')[1:] for a in res.keys()])
 
     # We multiply the number of common paths between url with the number
     # of times the url has been triggered by an exception.
     best_path = collections.defaultdict(int)
     for pre, nb_pre in prefixes:
-        for nb, uri in uris.items():
+        for uri, nb in res.items():
             if uri.startswith(pre):
                 best_path[pre] += int(nb) * nb_pre
 
