@@ -36,8 +36,8 @@ class Elastic(LogProvider):
         # We need to use multi_match, since we get the fields names dynamically.
         for key, value in filters.items():
             if isinstance(value, list):
-                self.search = self.search.query(
-                    reduce(operator.or_, [Q('multi_match', query=v, fields=[key]) for v in value])
+                self.search = self.search.query(Q('bool', must=[
+                    reduce(operator.or_, [Q('multi_match', query=v, fields=[key]) for v in value])])
                 )
             else:
                 self.search = self.search.query(Q("multi_match", query=value, fields=[key]))
