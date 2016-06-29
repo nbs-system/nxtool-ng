@@ -32,6 +32,12 @@ class Elastic(LogProvider):
         self.client = Elasticsearch([host, ], use_ssl=use_ssl, index=index, version=version)
         self.search = Search(using=self.client, index='nxapi', doc_type='events').extra(size=10000)
 
+    def export_search(self):
+        return self.search
+
+    def import_search(self, seach):
+        self.search = seach
+
     def add_filters(self, filters):
         # We need to use multi_match, since we get the fields names dynamically.
         for key, value in filters.items():
@@ -44,34 +50,38 @@ class Elastic(LogProvider):
 
     def get_top(self, field, size=250):
         ret = dict()
-
         self.search = self.search.params(search_type="count")
         self.search.aggs.bucket('TEST', 'terms', field=field)
-        for hit in self.search.execute().aggregations['TEST']['buckets']:
-            nb_hits = str(hit['doc_count'])
-            ret[nb_hits] = hit['key']
-
+        for hit in self.search.execute(ignore_cache=True).aggregations['TEST']['buckets']:
+            ret[hit['key']] = hit['doc_count']
         return ret
 
     def get_relevant_ids(self, fields):
-        id_blacklist = set()
-        ret = set()
-        for field in fields:
-            stats = collections.defaultdict(int)
-            size = 0
-            for logline in self.search.execute():
-                if logline['id'] not in id_blacklist:
-                    stats[logline['id']] += 1
-                size += 1.0
+        """ This function is supposed to return the id that are the reparteed/present on the `fields`. """
+        ret = list()
+        search = self.search
+        ids = set(int(i['id']) for i in self.search.execute(ignore_cache=True))
+        self.search = search
 
-            for k, v in stats.items():
-                if v / size < 0.10:
-                    logging.info('The id %s is present in less than 10%% (%f) of %s : non-significant.', k, v / size, field)
-                    id_blacklist.add(k)
-                else:
-                    ret.add(k)
+        for _id in ids:
+            data = collections.defaultdict(set)
+            search = self.search
+            self.add_filters({'id': _id})
 
-        return list(ret)
+            # Get how many different fields there are for a given `id`
+            step = 0
+            for step, res in enumerate(self.search.execute(ignore_cache=True)):
+                for field in fields:
+                    data[field].add(res[field])
+
+            for field, content in data.items():
+                if len(content) > step / 10:
+                    continue
+                break
+            else:
+                ret.append(_id)
+            self.search = search
+        return ret
 
     def reset_filters(self):
         self.search = Search(using=self.client, index='nxapi', doc_type='events').extra(size=10000)

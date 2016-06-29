@@ -60,7 +60,6 @@ def generate_whitelist(provider, whitelists):
     for uri, nb in uris.items():
         if not any(uri.startswith(i) for i in already_whitelisted_uri):
            res[uri] = nb
-    #uris = {nb: uri for (nb, uri) in uris.items() if not any(uri.startswith(i) for i in already_whitelisted_uri)}
 
     if not res:
         return []
