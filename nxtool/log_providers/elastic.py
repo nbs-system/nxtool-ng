@@ -49,38 +49,50 @@ class Elastic(LogProvider):
                 self.search = self.search.query(Q("multi_match", query=value, fields=[key]))
 
     def get_top(self, field, size=250):
+        search = self.search
         ret = dict()
         self.search = self.search.params(search_type="count")
         self.search.aggs.bucket('TEST', 'terms', field=field)
         for hit in self.search.execute(ignore_cache=True).aggregations['TEST']['buckets']:
             ret[hit['key']] = hit['doc_count']
+        self.search = search
         return ret
 
-    def get_relevant_ids(self, fields):
-        """ This function is supposed to return the id that are the reparteed/present on the `fields`. """
+    def get_relevant_ids(self, fields, percentage=10.0):
+        """ This function is supposed to return the id that are the reparteed/present on the `fields`.
+
+         :param list of str: fields:
+         :return list of int:
+         """
         ret = list()
         search = self.search
-        ids = set(int(i['id']) for i in self.search.execute(ignore_cache=True))
+        ids = set(int(i['id']) for i in self.search.execute())  # get all possible ID
         self.search = search
 
         for _id in ids:
-            data = collections.defaultdict(set)
             search = self.search
+
             self.add_filters({'id': _id})
 
             # Get how many different fields there are for a given `id`
-            step = 0
-            for step, res in enumerate(self.search.execute(ignore_cache=True)):
+            step = 0.0
+            data = collections.defaultdict(set)
+            for res in self.search.execute():
+                step += 1.0
                 for field in fields:
                     data[field].add(res[field])
 
+            # Ignore id that are present on less than 10% of different values of each fields
             for field, content in data.items():
-                if len(content) > step / 10:
+                _percentage = len(content) / step * 100.0
+                if _percentage > percentage:
                     continue
+                logging.debug('Discarding id \033[32m%s\033[0m present in %d%% of different values of the \033[32m%s\033[0m field', _id, _percentage, field)
                 break
             else:
                 ret.append(_id)
             self.search = search
+
         return ret
 
     def reset_filters(self):

@@ -6,12 +6,12 @@ from nxapi import whitelist as nxapi_whitelist
 
 from nxtool import printers
 from nxtool.log_providers import flat_file
-from nxtool.whitelists_generators import cookies, images_1002, google_analytics, url_wide_id
+from nxtool.whitelists_generators import cookies, images_1002, google_analytics, url_wide_id, site_wide_id
 
 import urllib3
 urllib3.disable_warnings()
 
-WL_MODULES = [url_wide_id, google_analytics, images_1002, cookies]
+WL_MODULES = [google_analytics, images_1002, cookies, url_wide_id, site_wide_id]
 
 try:
     from nxtool.log_providers import elastic
@@ -44,7 +44,7 @@ def __create_argparser():
     parser = argparse.ArgumentParser(description='Sweet tool to help you managing your naxsi logs.')
 
     parser.add_argument('hostname', action='store', nargs='?')
-    parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('-v', '--verbose', action='store_true')
 
     log_sources = parser.add_argument_group('Log sources')
     log_sources.add_argument('--elastic', action='store_true')

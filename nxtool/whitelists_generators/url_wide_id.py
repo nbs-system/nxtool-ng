@@ -11,6 +11,7 @@ def generate_whitelist(provider, whitelists):
     :param log_provider.elastic provider:
     :return:
     """
+    logging.info('Running \033[1murl_wide_id\033[0m')
     res = collections.defaultdict(dict)
 
     search = provider.export_search()
@@ -20,6 +21,7 @@ def generate_whitelist(provider, whitelists):
 
     for var_name, nb in data.items():
         if nb < 1000 or not var_name:
+            logging.debug('Discarding url argument \033[32m%s\033[0m (%d occurrences)', var_name, nb)
             continue
         search = provider.export_search()
         provider.add_filters({'zone': 'ARGS', 'var_name': var_name})

@@ -10,6 +10,7 @@ def generate_whitelist(provider, whitelists):
     :param provider:
     :return:
     """
+    logging.info('Running \033[1mGoogle analytics\033[0m')
     cookies_names = ['__utma', '__utmb', '__utmc', '__utmt', '__utmv', '__utmz']
     provider.add_filters({'zone': 'ARGS', 'var_name': cookies_names})
     data = provider.get_relevant_ids(['uri', 'ip'])

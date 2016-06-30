@@ -40,6 +40,8 @@ def __guess_prefixes(strings):
 
 @modify_search
 def generate_whitelist(provider, whitelists):
+    logging.info('Running \033[1mImage 1002\033[0m')
+
     provider.add_filters({'zone': 'URL', 'id': '1002'})
 
     uris = provider.get_top('uri')
@@ -76,6 +78,6 @@ def generate_whitelist(provider, whitelists):
 
     rules = []
     for url, nb in best_path.items():
-        logging.info('The url "%s" triggered %d exceptions for the rule 1002, whitelisting it.' % (url, nb))
+        logging.info('The url \033[32m%s\033[0m triggered %d exceptions for the rule 1002, whitelisting it.' % (url, nb))
         rules.append({'wl': [1002], 'mz': ['$URL_X:^%s|URL' % url], 'msg':'Images size (0x)'})
     return rules
