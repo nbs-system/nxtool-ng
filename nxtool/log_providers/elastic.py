@@ -62,9 +62,9 @@ class Elastic(LogProvider):
         """ This function is supposed to return the id that are the reparteed/present on the `fields`.
 
          :param list of str: fields:
-         :return list of int:
+         :return set of int:
          """
-        ret = list()
+        ret = set()
         search = self.search
         ids = set(int(i['id']) for i in self.search.execute())  # get all possible ID
         self.search = search
@@ -90,7 +90,7 @@ class Elastic(LogProvider):
                 logging.debug('Discarding id \033[32m%s\033[0m present in %d%% of different values of the \033[32m%s\033[0m field', _id, _percentage, field)
                 break
             else:
-                ret.append(_id)
+                ret.add(_id)
             self.search = search
 
         return ret

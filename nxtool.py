@@ -6,12 +6,12 @@ from nxapi import whitelist as nxapi_whitelist
 
 from nxtool import printers
 from nxtool.log_providers import flat_file
-from nxtool.whitelists_generators import cookies, images_1002, google_analytics, url_wide_id, site_wide_id
+from nxtool.whitelists_generators import cookies, images_1002, google_analytics, zone_var_wide, site_wide_id
 
 import urllib3
 urllib3.disable_warnings()
 
-WL_MODULES = [google_analytics, images_1002, cookies, url_wide_id, site_wide_id]
+WL_MODULES = [google_analytics, images_1002, cookies, zone_var_wide, site_wide_id]
 
 try:
     from nxtool.log_providers import elastic
