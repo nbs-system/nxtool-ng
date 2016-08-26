@@ -14,7 +14,7 @@ def generate_whitelist(provider, whitelists):
     logging.info('Running \033[1mzone_wide_id\033[0m')
     zones = provider.get_top('zone')
 
-    res = collections.defaultdict(dict)
+    res = collections.defaultdict(set)
     for zone in zones.keys():
         logging.info('Searching for id in the zone \033[1m%s\033[0m', zone)
         search = provider.export_search()
@@ -30,7 +30,8 @@ def generate_whitelist(provider, whitelists):
                 continue
             search = provider.export_search()
             provider.add_filters({'zone': zone, 'id': id_name})
-            res[zone][id_name] = provider.get_relevant_ids(['ip'])  # every peer should have triggered the exception
+            if int(id_name) in provider.get_relevant_ids(['ip']):
+                res[zone].add(id_name)
             provider.import_search(search)
 
     #TODO filter already whitelisted things
@@ -39,8 +40,6 @@ def generate_whitelist(provider, whitelists):
         return list()
 
     ret = []
-    
     for zone, content in res.items():
-        for id_name in content.keys():
-            ret.append({'mz': ['%s' % (zone,)], 'wl': [id_name], 'msg': 'zone-wide ID whitelist'})
+        ret.append({'mz': ['%s' % (zone,)], 'wl': content, 'msg': 'zone-wide ID whitelist'})
     return ret

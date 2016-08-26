@@ -42,7 +42,6 @@ def generate_whitelist(provider, whitelists):
         return list()
 
     ret = []
-    
     for uri, content in res.items():
-            ret.append({'mz': ['$URL:%s' % (uri,)], 'wl': content, 'msg': 'url-wide ID whitelist'})
+        ret.append({'mz': ['$URL:%s' % (uri,)], 'wl': content, 'msg': 'url-wide ID whitelist'})
     return ret
