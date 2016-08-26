@@ -39,6 +39,13 @@ class Elastic(LogProvider):
         self.search = seach
 
     def add_filters(self, filters):
+        """
+        Add `filters` to the query.
+         `filters is a dict of the form {'field': value, field2: value2}, but you can also use a list of values
+         instead of a `str`. They'll be added as a _or_ (and not a _and_).
+        :param dict filters:
+        :return:
+        """
         # We need to use multi_match, since we get the fields names dynamically.
         for key, value in filters.items():
             if isinstance(value, list):
