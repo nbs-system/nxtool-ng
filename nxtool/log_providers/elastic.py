@@ -49,6 +49,12 @@ class Elastic(LogProvider):
                 self.search = self.search.query(Q("multi_match", query=value, fields=[key]))
 
     def get_top(self, field, size=250):
+        """
+        Get the top values for the given `field`
+        :param str field: the field to filter on
+        :param int size: how many top values to return, top
+        :return dict of int: A structure of the form {value: number_of_hits, value2: numer_of_hits2}
+        """
         search = self.search
         ret = dict()
         self.search = self.search.params(search_type="count")
