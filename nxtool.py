@@ -91,7 +91,7 @@ def main():
         whitelist = list()
         for module in WL_MODULES:
             whitelist.extend(module.generate_whitelist(source, whitelist))
-        print(map(nxapi_whitelist.dict_to_str,  whitelist))
+        print('\n' + '\n'.join(map(nxapi_whitelist.dict_to_str,  whitelist)))
     else:
         print(printers.print_generic(source.get_results()))
 
