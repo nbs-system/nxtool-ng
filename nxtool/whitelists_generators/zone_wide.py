@@ -12,10 +12,11 @@ def generate_whitelist(provider, whitelists):
     :return:
     """
     logging.info('Running \033[1mzone_wide_id\033[0m')
-    res = collections.defaultdict(dict)
+    zones = provider.get_top('zone')
 
-    for zone in ['ARGS', 'BODY']:
-        logging.info('Searching for aguments in the zone \033[1m%s\033[0m', zone)
+    res = collections.defaultdict(dict)
+    for zone in zones.keys():
+        logging.info('Searching for id in the zone \033[1m%s\033[0m', zone)
         search = provider.export_search()
         provider.add_filters({'zone': zone})
         data = provider.get_top('id')
