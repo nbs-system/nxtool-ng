@@ -15,7 +15,7 @@ def generate_whitelist(provider, whitelists):
     res = collections.defaultdict(dict)
 
     for zone in ['ARGS', 'BODY', 'ARGS|NAME', 'BODY|NAME']:
-        logging.info('Searching for aguments in the zone \033[1m%s\033[0m', zone)
+        logging.debug('Searching for aguments in the zone \033[1m%s\033[0m', zone)
         search = provider.export_search()
         provider.add_filters({'zone': zone})
         data = provider.get_top('var_name')

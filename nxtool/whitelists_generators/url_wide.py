@@ -16,7 +16,7 @@ def generate_whitelist(provider, whitelists):
 
     res = collections.defaultdict(set)
     for uri in uris.keys():
-        logging.info('Searching for id in the uri \033[1m%s\033[0m', uri)
+        logging.debug('Searching for id in the uri \033[1m%s\033[0m', uri)
         search = provider.export_search()
         provider.add_filters({'uri': uri, 'zone': 'URL'})
         data = provider.get_top('id')

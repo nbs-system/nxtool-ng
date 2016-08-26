@@ -18,7 +18,7 @@ def generate_whitelist(provider, whitelists):
 
     ret = dict()
     for zone in zones.keys():
-        logging.info('Generating \033[1murl_wide_id\033[0m rules for \033[1m%s\033[0m' % zone)
+        logging.debug('Generating \033[1murl_wide_id\033[0m rules for \033[1m%s\033[0m' % zone)
         search = provider.export_search()
         provider.add_filters({'zone': zone})
         data = provider.get_relevant_ids(['zone'], 75)

@@ -16,7 +16,7 @@ def generate_whitelist(provider, whitelists):
 
     res = collections.defaultdict(set)
     for zone in zones.keys():
-        logging.info('Searching for id in the zone \033[1m%s\033[0m', zone)
+        logging.debug('Searching for id in the zone \033[1m%s\033[0m', zone)
         search = provider.export_search()
         provider.add_filters({'zone': zone})
         data = provider.get_top('id')

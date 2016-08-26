@@ -65,10 +65,12 @@ def __create_argparser():
 def main():
     args = __create_argparser()
 
+    logging.getLogger("elasticsearch").setLevel(logging.ERROR)
+    logging.getLogger("urllib3").setLevel(logging.ERROR)
     if args.verbose:
-        logging.getLogger("elasticsearch").setLevel(logging.ERROR)
-        logging.getLogger("urllib3").setLevel(logging.ERROR)
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.DEBUG, format= '%(message)s')
+    else:
+        logging.basicConfig(level=logging.INFO, format='[+] %(message)s')
 
     if args.elastic is True:
         if elastic_imported is False:
@@ -91,7 +93,8 @@ def main():
         whitelist = list()
         for module in WL_MODULES:
             whitelist.extend(module.generate_whitelist(source, whitelist))
-        print('\n' + '\n'.join(map(nxapi_whitelist.dict_to_str,  whitelist)))
+        print('\n\033[1mGenerated whitelists:\033[0m')
+        print('\t' + '\n\t'.join(map(nxapi_whitelist.dict_to_str,  whitelist)))
     else:
         print(printers.print_generic(source.get_results()))
 
