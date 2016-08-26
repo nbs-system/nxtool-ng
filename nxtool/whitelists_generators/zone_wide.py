@@ -11,7 +11,7 @@ def generate_whitelist(provider, whitelists):
     :param log_provider.elastic provider:
     :return:
     """
-    logging.info('Running \033[1mzone_wide_id\033[0m')
+    logging.info('Generating \033[1mzone\033[0m rules')
     zones = provider.get_top('zone')
 
     res = collections.defaultdict(set)

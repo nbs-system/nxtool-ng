@@ -10,7 +10,7 @@ def generate_whitelist(provider, whitelists):
     :param provider:
     :return:
     """
-    logging.info('Running \033[1mcookies\033[0m')
+    logging.info('Generating \033[1mcookies\033[0m rules')
     provider.add_filters({'zone': 'HEADERS', 'var_name': 'cookie'})
     #data = provider.get_relevant_ids(['uri', 'ip'])
     data = provider.get_relevant_ids(['uri'])

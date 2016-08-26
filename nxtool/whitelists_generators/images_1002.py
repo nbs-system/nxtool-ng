@@ -40,7 +40,7 @@ def __guess_prefixes(strings):
 
 @modify_search
 def generate_whitelist(provider, whitelists):
-    logging.info('Running \033[1mImage 1002\033[0m')
+    logging.info('Generating \033[1mImage 1002\033[0m rules')
 
     provider.add_filters({'zone': 'URL', 'id': '1002'})
 
