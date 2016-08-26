@@ -14,7 +14,7 @@ def generate_whitelist(provider, whitelists):
     logging.info('Running \033[1murl_wide_id\033[0m')
     res = collections.defaultdict(dict)
 
-    for zone in ['ARGS', 'BODY']:
+    for zone in ['ARGS', 'BODY', 'ARGS|NAME', 'BODY|NAME']:
         logging.info('Searching for aguments in the zone \033[1m%s\033[0m', zone)
         search = provider.export_search()
         provider.add_filters({'zone': zone})
