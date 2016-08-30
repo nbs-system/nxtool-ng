@@ -16,6 +16,9 @@ def generate_whitelist(provider, whitelists):
     logging.info('Generating \033[1msite\033[0m rules')
     zones = provider.get_top('zone')
 
+    for rule in whitelists:
+        provider.add_filters({'id': rule.get('wl', '*'), 'mz': rule.get('mz', '*')}, negative=True)
+
     ret = dict()
     for zone in zones.keys():
         logging.debug('Generating \033[1murl_wide_id\033[0m rules for \033[1m%s\033[0m' % zone)
@@ -25,8 +28,6 @@ def generate_whitelist(provider, whitelists):
         provider.import_search(search)
 
         if data:
-            if any(zone in r['mz'] and set(r['zl']) & set(data) for r in whitelists):
-                continue
             ret[zone] = data
 
     return list() if not ret else [{'mz' : [zone], 'wl': _id, 'msg': 'Site-wide id+zone'} for zone, _id in ret.items()]

@@ -9,10 +9,14 @@ def generate_whitelist(provider, whitelists):
     """
 
     :param log_provider.elastic provider:
+    :param list of dict whitelists:
     :return:
     """
     logging.info('Generating \033[1mzone\033[0m rules')
     zones = provider.get_top('zone')
+
+    for rule in whitelists:
+        provider.add_filters({'id': rule.get('wl', '*'), 'mz': rule.get('mz', '*')}, negative=True)
 
     res = collections.defaultdict(set)
     for zone in zones.keys():
@@ -33,8 +37,6 @@ def generate_whitelist(provider, whitelists):
             if int(id_name) in provider.get_relevant_ids(['ip']):
                 res[zone].add(id_name)
             provider.import_search(search)
-
-    #TODO filter already whitelisted things
 
     if not res:
         return list()

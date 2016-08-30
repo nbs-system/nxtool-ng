@@ -14,6 +14,9 @@ def generate_whitelist(provider, whitelists):
     logging.info('Generating \033[1murl\033[0m rules')
     uris = provider.get_top('uri')
 
+    for rule in whitelists:
+        provider.add_filters({'id': rule.get('wl', '*'), 'mz': rule.get('mz', '*')}, negative=True)
+
     res = collections.defaultdict(set)
     for uri in uris.keys():
         logging.debug('Searching for id in the uri \033[1m%s\033[0m', uri)
@@ -35,8 +38,6 @@ def generate_whitelist(provider, whitelists):
             if int(id_name) in provider.get_relevant_ids(['ip']):
                 res[uri].add(id_name)
             provider.import_search(search)
-
-    #TODO filter already whitelisted things
 
     if not res:
         return list()

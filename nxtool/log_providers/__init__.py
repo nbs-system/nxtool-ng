@@ -1,5 +1,5 @@
 class LogProvider(object):
-    def add_filters(self, filters):
+    def add_filters(self, filters, negative=False):
         """
         :param dict filters: What fields/values do we want to filter on?
         """

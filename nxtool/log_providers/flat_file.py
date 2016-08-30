@@ -63,7 +63,7 @@ class FlatFile(LogProvider):
     def get_results(self):
         return self.__get_filtered_logs()
 
-    def add_filters(self, filters):
+    def add_filters(self, filters, negative=False):
         for key, value in filters.items():
             if key == 'zone':
                 key = 'zone0'

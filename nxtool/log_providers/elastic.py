@@ -38,7 +38,7 @@ class Elastic(LogProvider):
     def import_search(self, seach):
         self.search = seach
 
-    def add_filters(self, filters):
+    def add_filters(self, filters, negative=False):
         """
         Add `filters` to the query.
          `filters is a dict of the form {'field': value, field2: value2}, but you can also use a list of values
@@ -47,13 +47,23 @@ class Elastic(LogProvider):
         :return:
         """
         # We need to use multi_match, since we get the fields names dynamically.
-        for key, value in filters.items():
-            if isinstance(value, list):
-                self.search = self.search.query(Q('bool', must=[
-                    reduce(operator.or_, [Q('multi_match', query=v, fields=[key]) for v in value])])
-                )
-            else:
-                self.search = self.search.query(Q("multi_match", query=value, fields=[key]))
+
+        if negative:  # TODO refactor this shit.
+            for key, value in filters.items():
+                if isinstance(value, list):
+                    self.search = self.search.query(Q('bool', must_not=[
+                        reduce(operator.or_, [Q('multi_match', query=v, fields=[key]) for v in value])])
+                    )
+                else:
+                    self.search = self.search.query(~Q("multi_match", query=value, fields=[key]))
+        else:
+            for key, value in filters.items():
+                if isinstance(value, list):
+                    self.search = self.search.query(Q('bool', must=[
+                        reduce(operator.or_, [Q('multi_match', query=v, fields=[key]) for v in value])])
+                    )
+                else:
+                    self.search = self.search.query(Q("multi_match", query=value, fields=[key]))
 
     def get_top(self, field, size=250):
         """

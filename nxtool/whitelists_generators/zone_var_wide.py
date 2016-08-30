@@ -14,6 +14,9 @@ def generate_whitelist(provider, whitelists):
     logging.info('Generating \033[1mvar + zone\033[0m rules')
     res = collections.defaultdict(dict)
 
+    for rule in whitelists:
+        provider.add_filters({'id': rule.get('wl', '*'), 'mz': rule.get('mz', '*')}, negative=True)
+
     for zone in ['ARGS', 'BODY', 'ARGS|NAME', 'BODY|NAME']:
         logging.debug('Searching for aguments in the zone \033[1m%s\033[0m', zone)
         search = provider.export_search()
@@ -31,8 +34,6 @@ def generate_whitelist(provider, whitelists):
             provider.add_filters({'zone': zone, 'var_name': var_name})
             res[zone][var_name] = provider.get_relevant_ids(['ip'])  # every peer should have triggered the exception
             provider.import_search(search)
-
-    #TODO filter already whitelisted things
 
     if not res:
         return list()
