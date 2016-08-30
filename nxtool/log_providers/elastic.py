@@ -47,25 +47,22 @@ class Elastic(LogProvider):
         :return:
         """
         # We need to use multi_match, since we get the fields names dynamically.
+        for key, value in filters.items():
+            if isinstance(value, set):
+                value = list(value)
 
-        if negative:  # TODO refactor this shit.
-            for key, value in filters.items():
-                if isinstance(value, set):
-                    value = list(value)
-                if isinstance(value, list):
+            if isinstance(value, list):
+                if negative:
                     self.search = self.search.query(Q('bool', must_not=[
                         reduce(operator.or_, [Q('multi_match', query=v, fields=[key]) for v in value])])
                     )
                 else:
-                    self.search = self.search.query(~Q("multi_match", query=value, fields=[key]))
-        else:
-            for key, value in filters.items():
-                if isinstance(value, set):
-                    value = list(value)
-                if isinstance(value, list):
                     self.search = self.search.query(Q('bool', must=[
                         reduce(operator.or_, [Q('multi_match', query=v, fields=[key]) for v in value])])
                     )
+            else:
+                if negative:
+                    self.search = self.search.query(~Q("multi_match", query=value, fields=[key]))
                 else:
                     self.search = self.search.query(Q("multi_match", query=value, fields=[key]))
 
