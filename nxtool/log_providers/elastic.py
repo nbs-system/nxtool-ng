@@ -35,8 +35,8 @@ class Elastic(LogProvider):
     def export_search(self):
         return self.search
 
-    def import_search(self, seach):
-        self.search = seach
+    def import_search(self, search):
+        self.search = search
 
     def add_filters(self, filters, negative=False):
         """
@@ -50,6 +50,8 @@ class Elastic(LogProvider):
 
         if negative:  # TODO refactor this shit.
             for key, value in filters.items():
+                if isinstance(value, set):
+                    value = list(value)
                 if isinstance(value, list):
                     self.search = self.search.query(Q('bool', must_not=[
                         reduce(operator.or_, [Q('multi_match', query=v, fields=[key]) for v in value])])
@@ -58,6 +60,8 @@ class Elastic(LogProvider):
                     self.search = self.search.query(~Q("multi_match", query=value, fields=[key]))
         else:
             for key, value in filters.items():
+                if isinstance(value, set):
+                    value = list(value)
                 if isinstance(value, list):
                     self.search = self.search.query(Q('bool', must=[
                         reduce(operator.or_, [Q('multi_match', query=v, fields=[key]) for v in value])])

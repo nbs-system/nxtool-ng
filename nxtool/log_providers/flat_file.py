@@ -32,6 +32,13 @@ class FlatFile(LogProvider):
                     for name in f.namelist():
                         self.__transform_logs(f.read(name))
 
+    def export_search(self):
+        return self.filters, self.negative_filters
+
+    def import_search(self, search):
+        self.filters, self.negative_filters = search
+
+
     def __transform_logs(self, it):
         for line in it:
             _, log = parse_nxlog(line)
