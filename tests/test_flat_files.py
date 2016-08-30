@@ -24,8 +24,6 @@ class TestParseLog(unittest.TestCase):
 
 
 class TestFiltering(unittest.TestCase):
-    maxDiff = None
-    
     def test_filter_str(self):
         parser = flat_file.FlatFile('./tests/data/cookies.txt')
         self.assertEquals([i for i in parser.get_results()][0], {'block': '0',
@@ -44,4 +42,8 @@ class TestFiltering(unittest.TestCase):
 
         parser = flat_file.FlatFile('./tests/data/cookies.txt')
         parser.add_filters({'ip': ['A.A.A.A']})
+        self.assertEquals([i for i in parser.get_results()], [])
+
+        parser = flat_file.FlatFile('./tests/data/cookies.txt')
+        parser.add_filters({'ip': ['X.X.X.X']}, negative=True)
         self.assertEquals([i for i in parser.get_results()], [])
