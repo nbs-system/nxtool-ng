@@ -16,6 +16,10 @@ class TestParseLog(unittest.TestCase):
 
     def test_generate_whitelist_images(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
-        self.assertEqual(images_1002.generate_whitelist(parser, []), [{'mz': ['$URL_X:^/phpMyAdmin-2.8.2/scripts/setup.php|URL'], 'wl': [1002], 'msg': 'Images size (0x)'}])
+        self.assertEqual(
+            images_1002.generate_whitelist(parser, []),
+            [{'mz': ['$URL_X:^/phpMyAdmin-2.8.2/scripts/setup.php|URL'], 'wl': [1002], 'msg': 'Images size (0x)'}]
+        )
+
         self.assertEqual(images_1002.generate_whitelist(parser, [{'wl': [1002]}]), [])
-        self.assertEqual(images_1002.generate_whitelist(parser, []), [{'mz': ['$URL_X:^/phpMyAdmin-2.8.2/scripts/setup.php|URL'], 'wl': [1002], 'msg': 'Images size (0x)'}])
+        
