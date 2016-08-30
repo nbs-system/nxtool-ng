@@ -14,6 +14,7 @@ class FlatFile(LogProvider):
     def __init__(self, fname='./tests/data/logs.txt'):
         self.logs = list()
         self.filters = collections.defaultdict(list)
+        self.negative_filters = collections.defaultdict(list)
 
         try:
             ftype = mimetypes.guess_all_extensions(fname)[0]
@@ -50,7 +51,7 @@ class FlatFile(LogProvider):
         """
         yield the loglines accordingly to the filtering policy defined in `self.filters`
         """
-        if not self.filters:  # we don't filter, give everything!
+        if not self.filters and not self.negative_filters:  # we don't filter, give everything!
             for log in self.logs:
                 yield log
         else:
@@ -58,7 +59,9 @@ class FlatFile(LogProvider):
                 for key, value in log.items():
                     if key in self.filters:  # are we filtering on this `key`?
                         if value in self.filters[key]:  # is the current `value` in the filtering list?
-                            yield log
+                            if key not in self.negative_filters:  # are we filtering on this particular `key`?
+                                if value not in self.negative_filters[key]:
+                                    yield log
 
     def get_results(self):
         return self.__get_filtered_logs()
@@ -69,7 +72,16 @@ class FlatFile(LogProvider):
                 key = 'zone0'
             elif key == 'var_name':
                 key = 'var_name0'
-            self.filters[key].append(value)
+            if negative is True:
+                if isinstance(value, list):
+                    self.negative_filters[key].extend(value)
+                else:
+                    self.negative_filters[key].append(value)
+            else:
+                if isinstance(value, list):
+                    self.filters[key].extend(value)
+                else:
+                    self.filters[key].append(value)
 
     def get_relevant_ids(self, fields):
         """
