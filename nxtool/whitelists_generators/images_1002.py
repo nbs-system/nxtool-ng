@@ -78,6 +78,6 @@ def generate_whitelist(provider, whitelists):
 
     rules = []
     for url, nb in best_path.items():
-        logging.info('The url \033[32m%s\033[0m triggered %d exceptions for the rule 1002, whitelisting it.' % (url, nb))
+        logging.info('The url \033[32m%s\033[0m triggered %d exceptions for the rule 1002, whitelisting it.', url, nb)
         rules.append({'wl': [1002], 'mz': ['$URL_X:^%s|URL' % url], 'msg':'Images size (0x)'})
     return rules

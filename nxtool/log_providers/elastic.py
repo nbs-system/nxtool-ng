@@ -14,7 +14,7 @@ except ImportError:  # python3
     from configparser import ConfigParser
 
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search, Q, MultiSearch
+from elasticsearch_dsl import Search, Q
 
 from nxtool.log_providers import LogProvider
 
