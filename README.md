@@ -14,9 +14,134 @@
 nxtool is a tool to magically transform your [naxsi]( http://naxsi.org ) logs into useful rules.
 It can get its data from your elastic instance, or you can feed it flat files,
 and it will magically show you some statistics, generate relevant whitelists,
-provide type-based rules, ...
+provide type-based rules, …
+
+It works with *modules*, that are generating whitelists, without overlapping each other.
 
 Proudly powered by [Python]( https://python.org ) (2 and 3 by the way),
 using (optionally) [elasticsearch-dsl]( https://elasticsearch-dsl.readthedocs.org/en/latest/ ),
-written with love and tears by the people of [NBS-System] ( https://nbs-system.com ),
+written with love and tears by the great people of [NBS-System]( https://nbs-system.com ),
 nxtools is released under the [GPL]( https://gnu.org/licenses/gpl.html ).
+
+# Usage
+
+```bash
+$ python nxtool.py -h                                                                                                                                             U [master] git:nxtool
+usage: nxtool.py [-h] [-v] [--elastic] [--flat-file] [--stdin] [--archive]
+                 [--typing] [--whitelist] [--filter FILTER] [--stats]
+                 [hostname]
+
+Sweet tool to help you managing your naxsi logs.
+
+positional arguments:
+  hostname
+
+optional arguments:
+  -h, --help       show this help message and exit
+  -v, --verbose
+
+Log sources:
+  --elastic
+  --flat-file
+  --stdin
+  --archive
+
+Actions:
+  --typing
+  --whitelist
+  --filter FILTER
+  --stats
+```
+
+For example, if you want some stats about `example.com` using your elasticsearch instance:
+
+```bash
+$ python nxtool.py --elastic --stats clusif.fr                                                                                                                    U [master] git:nxtool
+# IP #
+2.39.218.24: 14
+14.76.8.132: 18
+13.24.13.122: 8
+157.5.39.176: 13
+19.187.104.23: 8
+80.24.150.43: 21
+50.2.176.10: 198
+79.14.72.145: 44
+14.26.23.213: 80
+86.242.8.36: 58
+
+# URI #
+/cache.php: 12
+/11.php: 12
+/call-for-paper-contact/: 82
+/: 22
+/xmlrpc.php: 22
+/en/production/type.asp: 41
+/contact/: 21
+/wp-json/oembed/1.0/embed: 38
+/en/production/formation.asp: 68
+/totallylegit/: 14
+
+# ZONE #
+BODY: 276
+ARGS|NAME: 24
+URL: 22
+ARGS: 146
+HEADERS: 54
+BODY|NAME: 10
+FILE_EXT: 4
+
+# SERVER #
+example.com: 536
+```
+
+To generate some whitelists for `example.com`, using your elasticsearch instance:
+
+```bash
+$ python nxtool.py --elastic --whitelist example.com                                                                                                               U [master] git:nxtool
+[+] Generating Google analytics rules
+[+] Generating Image 1002 rules
+[+] Generating cookies rules
+[+] Generating var + zone rules
+[+] Generating site rules
+[+] Generating zone rules
+[+] Generating url rules
+
+Generated whitelists:
+	BasicRule wl:1310,1311 "mz:$HEADERS_VAR:cookie" "msg:Cookies";
+```
+
+You can add the `--verbose` flag if you want more information about what's going on.
+If you're using *flat files*, you can either pass, well flat files, but also *archives*,
+like `.zip` or `.tar.gz`.
+
+You can also use nxtool to query your elasticsearch instance, for example
+to search for access to `/admin`, that triggered the rule `1010` in the `HEADERS`:
+
+```bash
+$ python nxtool.py --elastic --filter 'uri=/admin,zone=HEADERS,id=1010'
+
+zone: HEADERS
+ip: 133.144.211.172
+whitelisted: false
+uri: /admin
+comments: import:2016-08-30 09:44:17.938620
+server: example.com
+content: 
+var_name: cookie
+country: 
+date: 2016-08-30T09:45:13+0200
+id: 1010
+
+zone: HEADERS
+ip: 15.125.251.122
+whitelisted: false
+uri: /admin
+comments: import:2016-08-30 11:00:03.523580
+server: example.com
+content: 
+var_name: cookie
+country: 
+date: 2016-08-30T11:06:36+0200
+id: 1010
+
+```
