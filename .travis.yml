@@ -13,7 +13,7 @@ python:
 script:
   - pip install -r requirements.txt
   - pip install coveralls nose2 nose2-cov
-  - coverage run --source=nxapi -m nose2.__main__ -v
+  - coverage run --source=nxtool -m nose2.__main__ -v
 
 after_success:
   - coveralls
