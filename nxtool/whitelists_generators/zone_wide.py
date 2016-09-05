@@ -42,6 +42,6 @@ def generate_whitelist(provider, whitelists):
         return list()
 
     ret = []
-    for zone, content in res.items():
-        ret.append({'mz': ['%s' % (zone,)], 'wl': content, 'msg': 'zone-wide ID whitelist'})
+    for zone, wid in res.items():
+        ret.append({'mz': ['%s' % (zone,)], 'wl': wid, 'msg': 'zone-wide ID whitelist'})
     return ret

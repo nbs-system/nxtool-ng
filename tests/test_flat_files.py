@@ -1,7 +1,7 @@
 import unittest
 
 from nxtool.log_providers import flat_file
-from nxtool.whitelists_generators import cookies, images_1002
+from nxtool.whitelists_generators import cookies, images_1002, zone_wide
 
 
 class TestParseLog(unittest.TestCase):
@@ -22,6 +22,13 @@ class TestParseLog(unittest.TestCase):
             [{'mz': ['$URL_X:^/phpMyAdmin-2.8.2/scripts/setup.php|URL'], 'wl': [1002], 'msg': 'Images size (0x)'}]
         )
         self.assertEqual(images_1002.generate_whitelist(parser, [{'wl': [1002]}]), [])
+
+    def test_generate_whitelist_zone_wide(self):
+        parser = flat_file.FlatFile('./tests/data/images_1002.txt')
+        parser.get_top = lambda x: {1337: 2048} if x =='id' else {'ARGS': 2048}
+        parser.get_relevant_ids = lambda x:  [1337]
+        self.assertEqual(zone_wide.generate_whitelist(parser, []),
+                         [{'msg': 'zone-wide ID whitelist', 'mz': ['ARGS'], 'wl': {1337}}])
 
 
 class TestFiltering(unittest.TestCase):

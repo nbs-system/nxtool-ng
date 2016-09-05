@@ -38,7 +38,6 @@ class FlatFile(LogProvider):
     def import_search(self, search):
         self.filters, self.negative_filters = search
 
-
     def __transform_logs(self, it):
         for line in it:
             _, log = parse_nxlog(line)
@@ -49,6 +48,8 @@ class FlatFile(LogProvider):
         ret = dict()
         if field == 'zone':
             field = 'zone0'
+        elif field == 'id':
+            field = 'id0'
         values = (log[field] for log in self.__get_filtered_logs())
         for key, value in collections.Counter(values).most_common(10):
             ret[key] = value
@@ -65,9 +66,9 @@ class FlatFile(LogProvider):
             for log in self.logs:
                 for key, value in log.items():
                     if key in self.filters:  # are we filtering on this `key`?
-                        if value in self.filters[key]:  # is the current `value` in the filtering list?
+                        if value in self.filters[key] and value != '*':  # is the current `value` in the filtering list?
                             if key not in self.negative_filters:  # are we filtering on this particular `key`?
-                                if value not in self.negative_filters[key]:
+                                if value not in self.negative_filters[key] and value != '*':
                                     yield log
 
     def get_results(self):
