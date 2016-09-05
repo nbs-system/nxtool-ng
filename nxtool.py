@@ -4,7 +4,7 @@ import logging
 
 from nxapi import whitelist as nxapi_whitelist
 
-from nxtool import printers
+from nxtool import printers, typing
 from nxtool.log_providers import flat_file
 from nxtool.whitelists_generators import cookies, images_1002, google_analytics, zone_var_wide, site_wide_id, zone_wide
 from nxtool.whitelists_generators import url_wide
@@ -93,8 +93,14 @@ def main():
         whitelist = list()
         for module in WL_MODULES:
             whitelist.extend(module.generate_whitelist(source, whitelist))
-        print('\n\033[1mGenerated whitelists:\033[0m')
-        print('\t' + '\n\t'.join(map(nxapi_whitelist.dict_to_str,  whitelist)))
+        if whitelist:
+            print('\n\033[1mGenerated whitelists:\033[0m')
+            print('\t' + '\n\t'.join(map(nxapi_whitelist.dict_to_str,  whitelist)))
+        else:
+            print('\n\033[1mnxtool was not able to generate meaningful whitelist\033[0m')
+    elif args.typing:
+        print('\n\033[1mGenerated types:\033[0m\n')
+        printers.print_typed_rules(typing.typification(source))
     else:
         print(printers.print_generic(source.get_results()))
 

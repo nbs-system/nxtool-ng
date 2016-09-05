@@ -16,3 +16,13 @@ def print_generic(results):
         it = results
     for item in it:
         print('\n'.join('%s: %s' % (k, item[k]) for k in item) + '\n')
+
+
+def print_typed_rules(results):
+    """
+
+    :param list of str results:
+    :return:
+    """
+    for rule in results:
+        print('BasicRule negative "rx:%s" "msg:%s" "mz:%s:%s" "s:BLOCK";' % tuple(rule))
