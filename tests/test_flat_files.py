@@ -56,6 +56,10 @@ class TestParseLog(unittest.TestCase):
         parser.get_top = lambda x: {'1337': 2048}
         self.assertEqual(url_wide.generate_whitelist(parser, []),
                          [{'msg': 'url-wide ID whitelist', 'mz': ['$URL:1337'], 'wl': {'1337'}}])
+        
+        parser.get_relevant_ids = lambda x: []
+        parser.get_top = lambda x: {}
+        self.assertEqual(url_wide.generate_whitelist(parser, [{'id': 1337}]), [])
 
     def test_generate_whitelist_site_wide_id(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
