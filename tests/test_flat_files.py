@@ -1,7 +1,7 @@
 import unittest
 
 from nxtool.log_providers import flat_file
-from nxtool.whitelists_generators import cookies, images_1002, zone_wide
+from nxtool.whitelists_generators import cookies, images_1002, zone_wide, zone_var_wide
 
 
 class TestParseLog(unittest.TestCase):
@@ -29,6 +29,17 @@ class TestParseLog(unittest.TestCase):
         parser.get_relevant_ids = lambda x:  [1337]
         self.assertEqual(zone_wide.generate_whitelist(parser, []),
                          [{'msg': 'zone-wide ID whitelist', 'mz': ['ARGS'], 'wl': {1337}}])
+
+    def test_generate_whitelist_zone_var_wide(self):
+        parser = flat_file.FlatFile('./tests/data/images_1002.txt')
+        parser.get_relevant_ids = lambda x: [1337]
+        parser.get_top = lambda x: {'test_var_name': 2048}
+        self.assertEqual(zone_var_wide.generate_whitelist(parser, []), [
+            {'msg': 'Variable', 'mz': ['BODY:test_var_name'], 'wl': [1337]},
+            {'msg': 'Variable', 'mz': ['ARGS|NAME:test_var_name'], 'wl': [1337]},
+            {'msg': 'Variable', 'mz': ['ARGS:test_var_name'], 'wl': [1337]},
+            {'msg': 'Variable', 'mz': ['BODY|NAME:test_var_name'], 'wl': [1337]}
+        ])
 
 
 class TestFiltering(unittest.TestCase):
