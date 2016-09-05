@@ -1,7 +1,8 @@
 import unittest
 
 from nxtool.log_providers import flat_file
-from nxtool.whitelists_generators import cookies, images_1002, zone_wide, zone_var_wide, url_wide
+from nxtool.whitelists_generators import cookies, images_1002, zone_wide, zone_var_wide, url_wide, site_wide_id
+from nxtool.whitelists_generators import google_analytics
 
 
 class TestParseLog(unittest.TestCase):
@@ -47,6 +48,20 @@ class TestParseLog(unittest.TestCase):
         parser.get_top = lambda x: {'1337': 2048}
         self.assertEqual(url_wide.generate_whitelist(parser, []),
                          [{'msg': 'url-wide ID whitelist', 'mz': ['$URL:1337'], 'wl': {'1337'}}])
+
+    def test_generate_whitelist_site_wide_id(self):
+        parser = flat_file.FlatFile('./tests/data/images_1002.txt')
+        parser.get_relevant_ids = lambda x, y: [1337]
+        parser.get_top = lambda x: {'1337': 2048}
+        self.assertEqual(site_wide_id.generate_whitelist(parser, []),
+                         [{'msg': 'Site-wide id+zone', 'mz': ['1337'], 'wl': [1337]}])
+
+    def test_generate_whitelist_google_analytics(self):
+        parser = flat_file.FlatFile('./tests/data/images_1002.txt')
+        parser.get_relevant_ids = lambda x: [1337]
+        parser.get_top = lambda x: {'1337': 2048}
+        self.assertEqual(google_analytics.generate_whitelist(parser, []),
+                         [{'msg': 'Google analytics', 'mz': ['$ARGS_VAR_X:__utm[abctvz]'], 'wl': [1337]}])
 
 
 class TestFiltering(unittest.TestCase):
