@@ -61,7 +61,7 @@ def generate_whitelist(provider, whitelists):
     res = dict()
     for uri, nb in uris.items():
         if not any(uri.startswith(i) for i in already_whitelisted_uri):
-           res[uri] = nb
+            res[uri] = nb
 
     if not res:
         return []
