@@ -27,21 +27,22 @@ def typification(source):
     regexps = [re.compile(reg, re.IGNORECASE) for reg, _ in REGEXPS]
 
     for line in source.get_results():
-            # naxsi inverts the var_name and the content
+        # naxsi inverts the var_name and the content
         # when a rule match on var_name
         if line.get('zone', 'zone0').endswith('|NAME'):
             continue
         zone = line.get('zone', 'zone0')
+
         var_name = line.get('var_name', 'var_name0')
+        if not var_name:  # No types for empty variabl names
+            continue
 
         try:
             content = line['content']
         except KeyError as e:
-            logging.error('%s has no "content" (line %s)', var_name, line)
+            logging.error('%s has no "content" (line %s): %s', var_name, line, e)
             continue
 
-        if not var_name:  # No types for empty varnames.
-            continue
 
         # Bump regexps until one matches
         # Since every regexp is a subset of the next one,
@@ -51,5 +52,5 @@ def typification(source):
 
     for zone, zone_data in rules.items():
         for var_name, index in zone_data.items():
-            if index < len(REGEXPS) - 1:  #  Don't return untyped things
+            if index < len(REGEXPS) - 1:  # Don't return untyped things
                 yield [REGEXPS[index][0], REGEXPS[index][1], zone, var_name]

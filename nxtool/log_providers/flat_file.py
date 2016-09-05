@@ -40,7 +40,9 @@ class FlatFile(LogProvider):
 
     def __transform_logs(self, it):
         for line in it:
-            _, log = parse_nxlog(line)
+            error, log = parse_nxlog(line)
+            if error:
+                logging.error('%s while parsing %s', error, line)
             if log:
                 self.logs.append(log)
 
@@ -119,4 +121,4 @@ class FlatFile(LogProvider):
                 else:
                     ret.add(k)
 
-        return map(int, ret)
+        return list(map(int, ret))
