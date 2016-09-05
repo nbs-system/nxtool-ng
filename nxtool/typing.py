@@ -1,5 +1,6 @@
 import re
 import collections
+import logging
 
 # Each regexp is (almost) a subset of the next one
 REGEXPS = [
@@ -26,16 +27,17 @@ def typification(source):
     regexps = [re.compile(reg, re.IGNORECASE) for reg, _ in REGEXPS]
 
     for line in source.get_results():
-        try:  # some events are fucked up^w^w empty
             # naxsi inverts the var_name and the content
-            # when a rule match on var_name
-            if line['zone'].endswith('|NAME'):
-                continue
-            zone = line['zone']
+        # when a rule match on var_name
+        if line.get('zone', 'zone0').endswith('|NAME'):
+            continue
+        zone = line.get('zone', 'zone0')
+        var_name = line.get('var_name', 'var_name0')
+
+        try:
             content = line['content']
-            var_name = line['var_name']
         except KeyError as e:
-            print('Error with : {0} ({1})'.format(line, e))
+            logging.error('%s has no "content" (line %s)', var_name, line)
             continue
 
         if not var_name:  # No types for empty varnames.
