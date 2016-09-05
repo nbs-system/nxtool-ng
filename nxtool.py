@@ -82,7 +82,7 @@ def main():
     elif args.stdin is True:
         source = flat_file.FlatFile(None)
     else:
-        print('Please give me a valid source.')
+        print('Please give me a valid source (or try to relaunch me with `-h` if you are lost).')
         return 1
 
     __filter(source, args.filter, args.hostname)  # Filtering can be used for any operation
