@@ -145,3 +145,16 @@ date: 2016-08-30T11:06:36+0200
 id: 1010
 
 ```
+
+It's also possible to *type* your parameters, to tighten a bit the security of
+your application:
+
+```
+$ python nxtool.py --elastic --typing --verbose example.com
+
+Generated types:
+
+BasicRule negative "rx:^$" "msg:empty" "mz:FILE_EXT:user_avatar" "s:BLOCK";
+BasicRule negative "rx:^$" "msg:empty" "mz:FILE_EXT:society_logo" "s:BLOCK";
+BasicRule negative "rx:^https?://([0-9a-z-.]+\.)+[\w?+-=&/ ]+$" "msg:url" "mz:ARGS:url" "s:BLOCK";
+```
