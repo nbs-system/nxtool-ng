@@ -39,16 +39,21 @@ class TestParseLog(unittest.TestCase):
                          [{'msg': 'zone-wide ID whitelist', 'mz': ['ARGS'], 'wl': {1337}}])
 
     def test_generate_whitelist_zone_var_wide(self):
-        return
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
         parser.get_relevant_ids = lambda x: [1337]
         parser.get_top = lambda x: {'test_var_name': 2048}
-        self.assertListEqual(zone_var_wide.generate_whitelist(parser, []), [
+        expected = [
             {'msg': 'Variable', 'mz': ['BODY:test_var_name'], 'wl': [1337]},
             {'msg': 'Variable', 'mz': ['ARGS|NAME:test_var_name'], 'wl': [1337]},
             {'msg': 'Variable', 'mz': ['ARGS:test_var_name'], 'wl': [1337]},
             {'msg': 'Variable', 'mz': ['BODY|NAME:test_var_name'], 'wl': [1337]}
-        ])
+        ]
+
+        try:
+            self.assertCountEqual(zone_var_wide.generate_whitelist(parser, []), expected)
+        except AttributeError:  # Python2/3 fuckery
+            self.assertItemsEqual(zone_var_wide.generate_whitelist(parser, []), expected)
+
 
     def test_generate_whitelist_url_wide(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
@@ -56,7 +61,7 @@ class TestParseLog(unittest.TestCase):
         parser.get_top = lambda x: {'1337': 2048}
         self.assertEqual(url_wide.generate_whitelist(parser, []),
                          [{'msg': 'url-wide ID whitelist', 'mz': ['$URL:1337'], 'wl': {'1337'}}])
-        
+
         parser.get_relevant_ids = lambda x: []
         parser.get_top = lambda x: {}
         self.assertEqual(url_wide.generate_whitelist(parser, [{'id': 1337}]), [])
