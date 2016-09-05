@@ -109,6 +109,9 @@ class FlatFile(LogProvider):
                 size += 1
 
             for k, v in stats.items():
+                if size < 1000:
+                    logging.debug('The field %s has not enough occurences (%d): non-significant', field, size)
+                    continue
                 if v < size / 10.0:
                     logging.debug('The id %s is present in less than 10%% (%d) of %s : non-significant.', k, v, field)
                     id_blacklist.add(k)

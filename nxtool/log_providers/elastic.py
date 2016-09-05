@@ -85,7 +85,8 @@ class Elastic(LogProvider):
     def get_relevant_ids(self, fields, percentage=10.0):
         """ This function is supposed to return the id that are the reparteed/present on the `fields`.
 
-         :param list of str: fields:
+         :param list of str fields:
+         :param float percentage:
          :return set of int:
          """
         ret = set()
@@ -106,6 +107,10 @@ class Elastic(LogProvider):
                 for field in fields:
                     data[field].add(res[field])
 
+            if step < 1000:
+                logging.debug('Discarding id \033[32m%s\033[0m only present %d times.', _id, step)
+                continue
+
             # Ignore id that are present on less than 10% of different values of each fields
             for field, content in data.items():
                 _percentage = len(content) / step * 100.0
@@ -125,7 +130,6 @@ class Elastic(LogProvider):
     def get_results(self):
         """
         Return a `Result` object obtained from the execution of the search `self.search`.
-        This method has a side effect: it re-initialize `self.search`.
         :return Result: The `Result` object obtained from the execution of the search `self.search`.
         """
         search = self.search
