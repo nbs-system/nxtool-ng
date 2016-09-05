@@ -12,7 +12,7 @@ from nxtool.whitelists_generators import url_wide
 import urllib3
 urllib3.disable_warnings()
 
-WL_MODULES = [google_analytics, images_1002, cookies, zone_var_wide, site_wide_id, zone_wide, url_wide]
+WL_MODULES = [google_analytics, images_1002, cookies, url_wide, zone_var_wide, zone_wide, site_wide_id]
 
 try:
     from nxtool.log_providers import elastic
