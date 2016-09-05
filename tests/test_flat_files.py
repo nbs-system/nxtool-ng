@@ -5,6 +5,13 @@ from nxtool.whitelists_generators import cookies, images_1002, zone_wide, zone_v
 from nxtool.whitelists_generators import google_analytics
 
 
+class TestFlatFiles(unittest.TestCase):
+    def test_get_relevant_ids(self):
+        parser = flat_file.FlatFile('./tests/data/cookies.txt')
+        self.assertEquals(parser.get_relevant_ids(['zone', ], 1, 1), [42000227])
+        self.assertEquals(parser.get_relevant_ids(['zone', ], 1, 100), [])
+
+
 class TestParseLog(unittest.TestCase):
     def test_show_stats(self):
         parser = flat_file.FlatFile()
@@ -12,7 +19,7 @@ class TestParseLog(unittest.TestCase):
 
     def test_generate_whitelist_cookies(self):
         parser = flat_file.FlatFile('./tests/data/cookies.txt')
-        parser.get_relevant_ids = lambda x:  [42000227]
+        parser.get_relevant_ids = lambda x: [42000227]
         self.assertEqual(cookies.generate_whitelist(parser, []), [{'wl': [42000227], 'mz':['$HEADERS_VAR:cookie'], 'msg': 'Cookies'}])
         self.assertEqual(cookies.generate_whitelist(parser, [{'wl': [42000227]}]), [])
 
@@ -27,7 +34,7 @@ class TestParseLog(unittest.TestCase):
     def test_generate_whitelist_zone_wide(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
         parser.get_top = lambda x: {1337: 2048} if x =='id' else {'ARGS': 2048}
-        parser.get_relevant_ids = lambda x:  [1337]
+        parser.get_relevant_ids = lambda x: [1337]
         self.assertEqual(zone_wide.generate_whitelist(parser, []),
                          [{'msg': 'zone-wide ID whitelist', 'mz': ['ARGS'], 'wl': {1337}}])
 

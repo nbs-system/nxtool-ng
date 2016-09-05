@@ -119,4 +119,4 @@ class FlatFile(LogProvider):
                 else:
                     ret.add(k)
 
-        return list(ret)
+        return map(int, ret)
