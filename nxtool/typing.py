@@ -33,7 +33,7 @@ def typification(source):
             continue
         zone = line.get('zone', 'zone0')
 
-        var_name = line.get('var_name', 'var_name0')
+        var_name = line.get('var_name', '')
         if not var_name:  # No types for empty variable names
             continue
 
