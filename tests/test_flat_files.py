@@ -38,6 +38,12 @@ class TestParseLog(unittest.TestCase):
         self.assertEqual(zone_wide.generate_whitelist(parser, []),
                          [{'msg': 'zone-wide ID whitelist', 'mz': ['ARGS'], 'wl': {1337}}])
 
+        parser.get_relevant_ids = lambda x: []
+        self.assertEqual(zone_wide.generate_whitelist(parser, [{'id':1337}]), [])
+
+        parser.get_top = lambda x: {1337: 2} if x =='id' else {'ARGS': 2}
+        self.assertEqual(zone_wide.generate_whitelist(parser, []), [])
+
     def test_generate_whitelist_zone_var_wide(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
         parser.get_relevant_ids = lambda x: [1337]
