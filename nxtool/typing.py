@@ -34,7 +34,7 @@ def typification(source):
         zone = line.get('zone', 'zone0')
 
         var_name = line.get('var_name', 'var_name0')
-        if not var_name:  # No types for empty variabl names
+        if not var_name:  # No types for empty variable names
             continue
 
         try:
@@ -42,7 +42,6 @@ def typification(source):
         except KeyError as e:
             logging.error('%s has no "content" (line %s): %s', var_name, line, e)
             continue
-
 
         # Bump regexps until one matches
         # Since every regexp is a subset of the next one,

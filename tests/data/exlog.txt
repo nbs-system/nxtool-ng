@@ -1,1 +1,1 @@
-2013/05/30 20:47:05 [debug] 10804#0:*1 NAXSI_EXLOG: ip=127.0.0.1&server=127.0.0.1&uri=/&id=1302&zone=ARGS&var_name=a&content=a<>bcd
+2013/05/30 20:47:05 [debug] 10804#0:*1 NAXSI_EXLOG: ip=127.0.0.1&server=127.0.0.1&uri=/&id=1302&zone=ARGS&var_name=a&content=1234
