@@ -10,7 +10,8 @@ REGEXPS = [
     [r'^#[0-9a-f]+$', 'colour'],  # '#' + hex
     [r'^[0-9a-f]+$', 'hexadecimal'],
     [r'^[0-9a-z]+$', 'alphanum'],
-    [r'^https?://([0-9a-z-.]+\.)+[\w?+-=&/ ]+$', 'url'],  # like http://example.com?hello=1&id=3
+    ['r^[./]?([0-9a-z]/)+[\w?+-=&/ ]+$', 'relative url'],
+    [r'^https?://([0-9a-z-.]+\.)+[\w?+-=&/ ]+$', 'absolute url'],  # like http://example.com?hello=1&id=3
     [r'^\w+$', 'alphanumdash'],
     [r'^[0-9a-z?&=+_-]+$', 'url parameter'],
     [r'^[\w[] ,&=+-]+$', 'array'],
