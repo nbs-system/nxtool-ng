@@ -51,6 +51,10 @@ class Elastic(LogProvider):
             if isinstance(value, set):
                 value = list(value)
 
+            # There is no need to process empty values.
+            if not value:
+                continue
+
             if isinstance(value, list):
                 if negative:
                     self.search = self.search.query(Q('bool', must_not=[
