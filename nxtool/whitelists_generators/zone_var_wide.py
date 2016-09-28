@@ -18,7 +18,7 @@ def generate_whitelist(provider, whitelists):
         provider.add_filters({'id': rule.get('wl', '*'), 'mz': rule.get('mz', '*')}, negative=True)
 
     for zone in ['ARGS', 'BODY', 'ARGS|NAME', 'BODY|NAME']:
-        logging.debug('Searching for aguments in the zone \033[1m%s\033[0m', zone)
+        logging.debug('Searching for arguments in the zone \033[1m%s\033[0m', zone)
         search = provider.export_search()
         provider.add_filters({'zone': zone})
         data = provider.get_top('var_name')
