@@ -87,7 +87,7 @@ class Elastic(LogProvider):
         return ret
 
     def get_relevant_ids(self, fields, percentage=10.0, minimum_occurences=1000):
-        """ This function is supposed to return the id that are the reparteed/present on the `fields`.
+        """ This function is supposed to return the id that are reparteed/present on the `fields`.
 
          :param list of str fields:
          :param float percentage:
