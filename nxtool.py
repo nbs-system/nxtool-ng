@@ -7,12 +7,13 @@ from nxapi import whitelist as nxapi_whitelist
 from nxtool import printers, typing
 from nxtool.log_providers import flat_file
 from nxtool.whitelists_generators import cookies, images_1002, google_analytics, zone_var_wide, site_wide_id, zone_wide
-from nxtool.whitelists_generators import url_wide
+from nxtool.whitelists_generators import url_wide, array_like_variables_names
 
 import urllib3
 urllib3.disable_warnings()
 
-WL_MODULES = [google_analytics, images_1002, cookies, url_wide, zone_var_wide, zone_wide, site_wide_id]
+WL_MODULES = [google_analytics, images_1002, array_like_variables_names, cookies, url_wide, zone_var_wide, zone_wide,
+              site_wide_id]
 
 try:
     from nxtool.log_providers import elastic
