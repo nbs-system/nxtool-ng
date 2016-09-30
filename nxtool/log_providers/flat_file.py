@@ -3,6 +3,7 @@ import fileinput
 import mimetypes
 import zipfile
 import tarfile
+import re
 import logging
 
 from nxapi.nxlog import parse_nxlog
@@ -15,6 +16,8 @@ class FlatFile(LogProvider):
         self.logs = list()
         self.filters = collections.defaultdict(list)
         self.negative_filters = collections.defaultdict(list)
+        self.filters_regexp = collections.defaultdict(list)
+        self.negative_filters_regexp = collections.defaultdict(list)
 
         try:
             ftype = mimetypes.guess_all_extensions(fname)[0]
@@ -33,10 +36,10 @@ class FlatFile(LogProvider):
                         self.__transform_logs(f.read(name))
 
     def export_search(self):
-        return self.filters, self.negative_filters
+        return self.filters, self.negative_filters, self.filters_regexp, self.negative_filters_regexp
 
     def import_search(self, search):
-        self.filters, self.negative_filters = search
+        self.filters, self.negative_filters, self.filters_regexp, self.negative_filters_regexp = search
 
     def __transform_logs(self, it):
         for line in it:
@@ -61,8 +64,8 @@ class FlatFile(LogProvider):
         """
         yield the loglines accordingly to the filtering policy defined in `self.filters`
         """
-        if not self.filters and not self.negative_filters:  # we don't filter, give everything!
-            for log in self.logs:
+        if not any((self.filters, self.filters_regexp, self.negative_filters_regexp, self.negative_filters)):
+            for log in self.logs:# we don't filter, give everything!
                 yield log
         else:
             for log in self.logs:
@@ -72,11 +75,16 @@ class FlatFile(LogProvider):
                             if key not in self.negative_filters:  # are we filtering on this particular `key`?
                                 if value not in self.negative_filters[key] and value != '*':
                                     yield log
+                    if key in self.filters_regexp:  # are we filtering on this `key`?
+                        if re.match(self.filters_regexp[key], value):  # is the current `value` in the filtering list?
+                            if key not in self.negative_filters_regexp:  # are we filtering on this particular `key`?
+                                if not re.match(self.negative_filters_regexp[key], value):
+                                    yield log
 
     def get_results(self):
         return self.__get_filtered_logs()
 
-    def add_filters(self, filters, negative=False):
+    def add_filters(self, filters, regexp=False, negative=False):  # TODO: simplify this shit
         for key, value in filters.items():
             if key == 'zone':
                 key = 'zone0'
@@ -84,14 +92,26 @@ class FlatFile(LogProvider):
                 key = 'var_name0'
             if negative is True:
                 if isinstance(value, list):
-                    self.negative_filters[key].extend(value)
+                    if regexp is True:
+                        self.negative_filters_regexp[key].extend(value)
+                    else:
+                        self.negative_filters[key].extend(value)
                 else:
-                    self.negative_filters[key].append(value)
+                    if regexp is True:
+                        self.negative_filters_regexp[key].append(value)
+                    else:
+                        self.negative_filters[key].append(value)
             else:
                 if isinstance(value, list):
-                    self.filters[key].extend(value)
+                    if regexp is True:
+                        self.filters_regexp[key].extend(value)
+                    else:
+                        self.filters[key].extend(value)
                 else:
-                    self.filters[key].append(value)
+                    if regexp is True:
+                        self.filters_regexp[key].append(value)
+                    else:
+                        self.filters[key].append(value)
 
     def get_relevant_ids(self, fields, percentage=10.0, minimum_occurences=1000):
         """

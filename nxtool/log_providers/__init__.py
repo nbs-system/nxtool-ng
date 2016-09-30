@@ -1,7 +1,9 @@
 class LogProvider(object):
-    def add_filters(self, filters, negative=False):
+    def add_filters(self, filters, regexp=False, negative=False):
         """
         :param dict filters: What fields/values do we want to filter on?
+        :param bool regexp: Treat `filters` as regexp ?
+        :param bool negative: Shall the match be negative ?
         """
         raise NotImplementedError
 

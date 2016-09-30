@@ -23,10 +23,10 @@ except ImportError:
     elastic_imported = False
 
 
-def __filter(source, filters, hostname=''):
+def __filter(source, filters, regexp=False, hostname='',):
     _filter = {}
 
-    if filters:
+    if filters or regexp:
         for param in filters.split(','):
             try:
                 key, value = param.split('=')
@@ -38,7 +38,7 @@ def __filter(source, filters, hostname=''):
     if hostname:
         _filter['server'] = hostname
 
-    source.add_filters(_filter)
+    source.add_filters(_filter, regexp)
 
 
 def __create_argparser():
@@ -58,6 +58,7 @@ def __create_argparser():
     actions.add_argument('--typing', action='store_true')
     actions.add_argument('--whitelist', action='store_true')
     actions.add_argument('--filter', action='store')
+    actions.add_argument('--filter-regexp', action='store')
     actions.add_argument('--stats', action='store_true')
 
     return parser.parse_args()
@@ -86,7 +87,7 @@ def main():
         print('Please give me a valid source (or try to relaunch me with `-h` if you are lost).')
         return 1
 
-    __filter(source, args.filter, args.hostname)  # Filtering can be used for any operation
+    __filter(source, args.filter, args.filter_regexp, args.hostname)  # Filtering can be used for any operation
 
     if args.stats:
         printers.print_statistics(source.get_statistics())

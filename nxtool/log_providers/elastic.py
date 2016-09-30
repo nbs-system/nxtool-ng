@@ -38,7 +38,7 @@ class Elastic(LogProvider):
     def import_search(self, search):
         self.search = search
 
-    def add_filters(self, filters, negative=False):
+    def add_filters(self, filters, regexp=False, negative=False):
         """
         Add `filters` to the query.
          `filters is a dict of the form {'field': value, field2: value2}, but you can also use a list of values
