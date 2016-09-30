@@ -26,7 +26,7 @@ except ImportError:
 def __filter(source, filters, regexp=False, hostname='',):
     _filter = {}
 
-    if filters or regexp:
+    if filters:
         for param in filters.split(','):
             try:
                 key, value = param.split('=')
@@ -87,7 +87,11 @@ def main():
         print('Please give me a valid source (or try to relaunch me with `-h` if you are lost).')
         return 1
 
-    __filter(source, args.filter, args.filter_regexp, args.hostname)  # Filtering can be used for any operation
+    # Filtering can be used for any operation
+    if args.filter:
+        __filter(source, args.filter, regexp=False, hostname=args.hostname)
+    if args.filter_regexp:
+        __filter(source, args.filter_regexp, regexp=True, hostname=args.hostname)
 
     if args.stats:
         printers.print_statistics(source.get_statistics())
