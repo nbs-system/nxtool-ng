@@ -10,9 +10,12 @@ def __check_and_strip_brackets(string):
     :param str string:
     :return bool|int:
     """
-    if sum(1 if char == '[' else -1 if char == ']' else 0 for char in string):
+    if sum(1 if char == '[' else -1 if char == ']' else 0 for char in string) != 0:
         return False
-    return string[:string.index('[')]
+    try:
+        return string[:string.index('[')]
+    except ValueError:  # no '[' nor ']' in the `string`
+        return False
 
 
 @modify_search
@@ -31,8 +34,8 @@ def generate_whitelist(provider, whitelists):
     variables = provider.get_top('var_name')
     provider.import_search(search)
 
-    ret = set()
-    for var_name, nb in variables:
+    ret = list()
+    for var_name, nb in variables.items():
         if nb < 1000:
             logging.debug('Discarding the variable \033[32m%s\033[0m (%d occurrences)', var_name, nb)
             continue
@@ -41,8 +44,8 @@ def generate_whitelist(provider, whitelists):
         if not stripped_name:
             logging.debug('The variable \033[32m%s\033[0m does not have an expected form', var_name, nb)
             continue
-        ret.add({
+        ret.append({
             'mz': ['$BODY_VAR_X:%s\[.+\]' % stripped_name, '$ARGS_VAR_X:%s\[.+\]' % stripped_name],
             'wl': ids, 'msg': 'Array-like variable name'})
 
-    return list(ret)
+    return ret
