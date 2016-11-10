@@ -28,6 +28,8 @@ def typification(source):
     regexps = [re.compile(reg, re.IGNORECASE) for reg, _ in REGEXPS]
 
     for line in source.get_results():
+        line = {i:line[i] for i in line}  # because `Results` objects are weird, we prefer to manipulate `dict` instead
+
         # naxsi inverts the var_name and the content
         # when a rule match on var_name
         if line.get('zone', 'zone0').endswith('|NAME'):
