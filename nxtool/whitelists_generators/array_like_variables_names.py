@@ -35,6 +35,7 @@ def generate_whitelist(provider, whitelists):
     provider.import_search(search)
 
     ret = list()
+    stripped_names = set()
     for var_name, nb in variables.items():
         if nb < 1000:
             logging.debug('Discarding the variable \033[32m%s\033[0m (%d occurrences)', var_name, nb)
@@ -44,8 +45,16 @@ def generate_whitelist(provider, whitelists):
         if not stripped_name:
             logging.debug('The variable \033[32m%s\033[0m does not have an expected form', var_name)
             continue
-        ret.append({
-            'mz': ['$BODY_VAR_X:%s\[.+\]' % stripped_name, '$ARGS_VAR_X:%s\[.+\]' % stripped_name],
-            'wl': ids, 'msg': 'Array-like variable name'})
+
+        if stripped_name not in stripped_names:
+            stripped_names.add(stripped_name)
+            ret.append({
+                'mz': ['$BODY_VAR_X:%s\[.+\]' % stripped_name],
+                'wl': ids, 'msg': 'Array-like variable name'})
+            ret.append({
+                'mz': ['$ARGS_VAR_X:%s\[.+\]' % stripped_name],
+                'wl': ids, 'msg': 'Array-like variable name'})
+
+
 
     return ret
