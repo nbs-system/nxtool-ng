@@ -34,8 +34,8 @@ def generate_whitelist(provider, whitelists):
     variables = provider.get_top('var_name')
     provider.import_search(search)
 
-    ret = list()
-    stripped_names = set()
+    ret = list()  # we can't use a `set` for `ret`, because we're using `dict` with it, and they're unhashable.
+    stripped_names = set()  # so we don't add duplicate rules
     for var_name, nb in variables.items():
         if nb < 1000:
             logging.debug('Discarding the variable \033[32m%s\033[0m (%d occurrences)', var_name, nb)
@@ -54,7 +54,4 @@ def generate_whitelist(provider, whitelists):
             ret.append({
                 'mz': ['$ARGS_VAR_X:%s\[.+\]' % stripped_name],
                 'wl': ids, 'msg': 'Array-like variable name'})
-
-
-
     return ret
