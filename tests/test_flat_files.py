@@ -50,9 +50,9 @@ class TestParseLog(unittest.TestCase):
         parser.get_top = lambda x: {'test_var_name': 2048}
         expected = [
             {'msg': 'Variable zone-wide', 'mz': ['BODY:test_var_name'], 'wl': [1337]},
-            {'msg': 'Variable zone-wide', 'mz': ['ARGS|NAME:test_var_name'], 'wl': [1337]},
+            {'msg': 'Variable zone-wide', 'mz': ['ARGS:test_var_name|NAME'], 'wl': [1337]},
             {'msg': 'Variable zone-wide', 'mz': ['ARGS:test_var_name'], 'wl': [1337]},
-            {'msg': 'Variable zone-wide', 'mz': ['BODY|NAME:test_var_name'], 'wl': [1337]}
+            {'msg': 'Variable zone-wide', 'mz': ['BODY:test_var_name|NAME'], 'wl': [1337]}
         ]
         self.maxDiff = 133337
         try:
