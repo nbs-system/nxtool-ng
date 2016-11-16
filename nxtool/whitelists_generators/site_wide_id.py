@@ -27,5 +27,5 @@ def generate_whitelist(provider, whitelists):
         if data:
             ret[zone] = data
 
-    return list() if not ret else [{'mz' : [zone], 'wl': _id, 'msg': 'Site-wide id+zone'} for zone, _id in ret.items()]
+    return list() if not ret else [{'mz': [zone], 'wl': _id, 'msg': 'Site-wide id+zone'} for zone, _id in ret.items()]
 

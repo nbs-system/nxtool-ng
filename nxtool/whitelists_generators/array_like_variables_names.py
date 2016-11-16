@@ -30,6 +30,9 @@ def generate_whitelist(provider, whitelists):
     logging.info('Generating \033[1marray-like variable name\033[0m rules')
     search = provider.export_search()
 
+    for rule in whitelists:
+        provider.add_filters({'id': rule.get('wl', '*'), 'mz': rule.get('mz', '*')}, negative=True)
+
     provider.add_filters({'zone': ['ARGS|NAME', 'BODY|NAME'], 'id': ids})
     variables = provider.get_top('var_name')
     provider.import_search(search)

@@ -36,7 +36,8 @@ def generate_whitelist(provider, whitelists):
                     continue
                 search = provider.export_search()
                 provider.add_filters({'zone': zone, 'var_name': var_name})
-                res[uri][zone][var_name] = provider.get_relevant_ids(['ip'])  # every peer should have triggered the exception
+                # every peer should have triggered the exception
+                res[uri][zone][var_name] = provider.get_relevant_ids(['ip'])
                 provider.import_search(search)
         provider.import_search(_search)
 
@@ -55,5 +56,7 @@ def generate_whitelist(provider, whitelists):
                     mz = '%s:%s|%s' % (zone.split('|')[0], var_name, 'NAME')
                 else:
                     mz = '$%s_VAR:%s' % (zone, var_name)
-                ret.append({'mz': [mz + '|$URL:%s' % uri], 'wl': __content, 'msg': 'Variable zone-wide on a specific url'})
+                ret.append(
+                    {'mz': [mz + '|$URL:%s' % uri], 'wl': __content, 'msg': 'Variable zone-wide on a specific url'}
+                )
     return ret

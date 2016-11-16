@@ -4,6 +4,7 @@ import operator
 import collections
 
 try:  # Fuck you guido for removing reduce
+    # noinspection PyUnresolvedReferences
     from functools import reduce
 except ImportError:
     pass

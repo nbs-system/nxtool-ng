@@ -65,7 +65,7 @@ class FlatFile(LogProvider):
         yield the loglines accordingly to the filtering policy defined in `self.filters`
         """
         if not any((self.filters, self.filters_regexp, self.negative_filters_regexp, self.negative_filters)):
-            for log in self.logs:# we don't filter, give everything!
+            for log in self.logs:  # we don't filter, give everything!
                 yield log
         else:
             for log in self.logs:

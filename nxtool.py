@@ -23,7 +23,7 @@ except ImportError:
     elastic_imported = False
 
 
-def __filter(source, filters, regexp=False, hostname='',):
+def __filter(source, filters, regexp=False, hostname=''):
     _filter = {}
 
     if filters:

@@ -55,7 +55,7 @@ def generate_whitelist(provider, whitelists):
             if 'mz' not in r:
                 already_whitelisted_uri = already_whitelisted_uri.union('/')
                 break
-            elif 'URL' in r['mz'] :
+            elif 'URL' in r['mz']:
                 already_whitelisted_uri = already_whitelisted_uri.union(r['mz'])
 
     res = dict()
@@ -79,5 +79,5 @@ def generate_whitelist(provider, whitelists):
     rules = []
     for url, nb in best_path.items():
         logging.info('The url \033[32m%s\033[0m triggered %d exceptions for the rule 1002, whitelisting it.', url, nb)
-        rules.append({'wl': [1002], 'mz': ['$URL_X:^%s|URL' % url], 'msg':'Images size (0x)'})
+        rules.append({'wl': [1002], 'mz': ['$URL_X:^%s|URL' % url], 'msg': 'Images size (0x)'})
     return rules
