@@ -23,6 +23,7 @@ def generate_whitelist(provider, whitelists):
     """
 
     :param provider:
+    :list
     :return:
     """
     ids = [1310, 1311]  # [ and ]

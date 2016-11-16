@@ -57,6 +57,6 @@ def generate_whitelist(provider, whitelists):
                 else:
                     mz = '$%s_VAR:%s' % (zone, var_name)
                 ret.append(
-                    {'mz': [mz + '|$URL:%s' % uri], 'wl': __content, 'msg': 'Variable zone-wide on a specific url'}
+                    {'mz': ['$URL:%s|%s' % (uri, mz)], 'wl': __content, 'msg': 'Variable zone-wide on a specific url'}
                 )
     return ret
