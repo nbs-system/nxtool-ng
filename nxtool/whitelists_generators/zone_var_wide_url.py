@@ -1,13 +1,14 @@
 import logging
 import collections
 
+from nxapi.rules import get_description_core
 from . import modify_search
 
 
 @modify_search
 def generate_whitelist(provider, whitelists):
     """
-
+    Generate rules for a specific variable, in a specific zone, on a specific url.
     :param log_provider.elastic provider:
     :return:
     """
@@ -36,7 +37,6 @@ def generate_whitelist(provider, whitelists):
                     continue
                 search = provider.export_search()
                 provider.add_filters({'zone': zone, 'var_name': var_name})
-                # every peer should have triggered the exception
                 res[uri][zone][var_name] = provider.get_relevant_ids(['ip'])
                 provider.import_search(search)
         provider.import_search(_search)
@@ -49,14 +49,16 @@ def generate_whitelist(provider, whitelists):
         for zone, _content in content.items():
             if not _content:  # We don't care about empty sets
                 continue
-            for var_name, __content in _content.items():
-                if not __content:
+            for var_name, __ids in _content.items():
+                if not __ids:
                     continue
+                descriptions = ', or a '.join(map(get_description_core, __ids))
                 if zone.endswith('|NAME'):
                     mz = '%s:%s|%s' % (zone.split('|')[0], var_name, 'NAME')
                 else:
                     mz = '$%s_VAR:%s' % (zone, var_name)
                 ret.append(
-                    {'mz': ['$URL:%s|%s' % (uri, mz)], 'wl': __content, 'msg': 'Variable zone-wide on a specific url'}
+                    {'mz': ['$URL:%s|%s' % (uri, mz)], 'wl': __ids,
+                     'msg': 'Variable zone-wide on a specific url if it matches a %s' % descriptions}
                 )
     return ret

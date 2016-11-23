@@ -1,6 +1,7 @@
 import logging
 import collections
 
+from nxapi.rules import get_description_core
 from . import modify_search
 
 
@@ -43,5 +44,7 @@ def generate_whitelist(provider, whitelists):
 
     ret = []
     for zone, wid in res.items():
-        ret.append({'mz': ['%s' % (zone,)], 'wl': wid, 'msg': 'zone-wide ID whitelist'})
+        descriptions = ', or a '.join(map(get_description_core, wid))
+        ret.append({'mz': ['%s' % (zone,)], 'wl': wid,
+                    'msg': 'zone-wide ID whitelist if it matches a %s' % descriptions})
     return ret

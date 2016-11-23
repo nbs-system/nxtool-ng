@@ -1,6 +1,7 @@
 import logging
 import collections
 
+from nxapi.rules import get_description_core
 from . import modify_search
 
 
@@ -41,10 +42,12 @@ def generate_whitelist(provider, whitelists):
     ret = []
     for zone, content in res.items():
         for variable, ids in content.items():
-            if ids:  # We don't care about empty sets
-                if zone.endswith('|NAME'):
-                    mz = '%s:%s|%s' % (zone.split('|')[0], variable, 'NAME')
-                else:
-                    mz = '%s:%s' % (zone, variable)
-                ret.append({'mz': [mz], 'wl': ids, 'msg': 'Variable zone-wide'})
+            if not ids:  # We don't care about empty sets
+                continue
+            descriptions = ', or a '.join(map(get_description_core, ids))
+            if zone.endswith('|NAME'):
+                mz = '%s:%s|%s' % (zone.split('|')[0], variable, 'NAME')
+            else:
+                mz = '%s:%s' % (zone, variable)
+            ret.append({'mz': [mz], 'wl': ids, 'msg': 'Variable zone-wide if it matches a %s' % descriptions})
     return ret

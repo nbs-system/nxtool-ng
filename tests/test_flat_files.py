@@ -36,7 +36,7 @@ class TestParseLog(unittest.TestCase):
         parser.get_top = lambda x: {1337: 2048} if x =='id' else {'ARGS': 2048}
         parser.get_relevant_ids = lambda x: [1337]
         self.assertEqual(zone_wide.generate_whitelist(parser, []),
-                         [{'msg': 'zone-wide ID whitelist', 'mz': ['ARGS'], 'wl': {1337}}])
+                         [{'msg': 'zone-wide ID whitelist if it matches a id 1337', 'mz': ['ARGS'], 'wl': {1337}}])
 
         parser.get_relevant_ids = lambda x: []
         self.assertEqual(zone_wide.generate_whitelist(parser, [{'id':1337}]), [])
@@ -49,10 +49,10 @@ class TestParseLog(unittest.TestCase):
         parser.get_relevant_ids = lambda x: [1337]
         parser.get_top = lambda x: {'test_var_name': 2048}
         expected = [
-            {'msg': 'Variable zone-wide', 'mz': ['BODY:test_var_name'], 'wl': [1337]},
-            {'msg': 'Variable zone-wide', 'mz': ['ARGS:test_var_name|NAME'], 'wl': [1337]},
-            {'msg': 'Variable zone-wide', 'mz': ['ARGS:test_var_name'], 'wl': [1337]},
-            {'msg': 'Variable zone-wide', 'mz': ['BODY:test_var_name|NAME'], 'wl': [1337]}
+            {'msg': 'Variable zone-wide if it matches a id 1337', 'mz': ['BODY:test_var_name'], 'wl': [1337]},
+            {'msg': 'Variable zone-wide if it matches a id 1337', 'mz': ['ARGS:test_var_name|NAME'], 'wl': [1337]},
+            {'msg': 'Variable zone-wide if it matches a id 1337', 'mz': ['ARGS:test_var_name'], 'wl': [1337]},
+            {'msg': 'Variable zone-wide if it matches a id 1337', 'mz': ['BODY:test_var_name|NAME'], 'wl': [1337]}
         ]
         self.maxDiff = 133337
         try:
@@ -66,7 +66,7 @@ class TestParseLog(unittest.TestCase):
         parser.get_relevant_ids = lambda x: [1337]
         parser.get_top = lambda x: {'1337': 2048}
         self.assertEqual(url_wide.generate_whitelist(parser, []),
-                         [{'msg': 'url-wide ID whitelist', 'mz': ['$URL:1337'], 'wl': {'1337'}}])
+                         [{'msg': 'url-wide whitelist if it matches a id 1337', 'mz': ['$URL:1337'], 'wl': {'1337'}}])
 
         parser.get_relevant_ids = lambda x: []
         parser.get_top = lambda x: {}
@@ -77,7 +77,7 @@ class TestParseLog(unittest.TestCase):
         parser.get_relevant_ids = lambda x, y: [1337]
         parser.get_top = lambda x: {'1337': 2048}
         self.assertEqual(site_wide_id.generate_whitelist(parser, []),
-                         [{'msg': 'Site-wide id+zone', 'mz': ['1337'], 'wl': [1337]}])
+                         [{'msg': 'Site-wide id+zone if it matches id [1337]', 'mz': ['1337'], 'wl': [1337]}])
 
     def test_generate_whitelist_google_analytics(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
