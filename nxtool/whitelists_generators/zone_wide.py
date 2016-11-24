@@ -39,12 +39,12 @@ def generate_whitelist(provider, whitelists):
                 res[zone].add(id_name)
             provider.import_search(search)
 
-    if not res:
-        return list()
-
-    ret = []
+    ret = list()
     for zone, wid in res.items():
-        descriptions = ', or a '.join(map(get_description_core, wid))
-        ret.append({'mz': ['%s' % (zone,)], 'wl': wid,
-                    'msg': 'zone-wide ID whitelist if it matches a %s' % descriptions})
+        ret.append(
+            {
+                'mz': ['%s' % (zone,)],
+                'wl': wid,
+                'msg': 'zone-wide ID whitelist if it matches a %s' % ', or a '.join(map(get_description_core, wid))}
+        )
     return ret
