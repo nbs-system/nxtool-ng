@@ -21,22 +21,21 @@ def __check_and_strip_brackets(string):
 @modify_search
 def generate_whitelist(provider, whitelists):
     """
+    Generate whitelists for variables that look like an array, eg. `pouet[1]`, `pouet[1[2]3]`, or `pouet[1][2]`.
 
-    :param provider:
-    :list
-    :return:
+    :param provider: The data provider
+    :param list whitelist: Already generated rules, acting as a whitelist
+    :return list of dict: The generated whitelists
     """
     ids = [1310, 1311]  # [ and ]
 
     logging.info('Generating \033[1marray-like variable name\033[0m rules')
-    search = provider.export_search()
 
     for rule in whitelists:
         provider.add_filters({'id': rule.get('wl', '*'), 'mz': rule.get('mz', '*')}, negative=True)
 
     provider.add_filters({'zone': ['ARGS|NAME', 'BODY|NAME'], 'id': ids})
     variables = provider.get_top('var_name')
-    provider.import_search(search)
 
     ret = list()  # we can't use a `set` for `ret`, because we're using `dict` with it, and they're unhashable.
     stripped_names = set()  # so we don't add duplicate rules
