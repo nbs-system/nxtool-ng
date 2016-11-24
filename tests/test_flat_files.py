@@ -20,8 +20,8 @@ class TestParseLog(unittest.TestCase):
     def test_generate_whitelist_cookies(self):
         parser = flat_file.FlatFile('./tests/data/cookies.txt')
         parser.get_relevant_ids = lambda x: [42000227]
-        self.assertEqual(cookies.generate_whitelist(parser, []), [{'wl': [42000227], 'mz':['$HEADERS_VAR:cookie'], 'msg': 'Cookies'}])
-        self.assertEqual(cookies.generate_whitelist(parser, [{'wl': [42000227]}]), [])
+        self.assertEqual(cookies.generate_whitelist(parser, []), [{'wl': [42000227], 'mz':['$HEADERS_VAR:cookie'],
+                                                                   'msg': 'Cookies that matches a id 42000227'}])
 
     def test_generate_whitelist_images(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
