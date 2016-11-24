@@ -41,10 +41,7 @@ def generate_whitelist(provider, whitelists):
                 provider.import_search(search)
         provider.import_search(_search)
 
-    if not res:
-        return list()
-
-    ret = []
+    ret = list()
     for uri, content in res.items():
         for zone, _content in content.items():
             if not _content:  # We don't care about empty sets

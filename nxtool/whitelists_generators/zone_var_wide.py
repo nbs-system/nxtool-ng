@@ -36,10 +36,7 @@ def generate_whitelist(provider, whitelists):
             res[zone][var_name] = provider.get_relevant_ids(['ip'])  # every peer should have triggered the exception
             provider.import_search(search)
 
-    if not res:
-        return list()
-
-    ret = []
+    ret = list()
     for zone, content in res.items():
         for variable, ids in content.items():
             if not ids:  # We don't care about empty sets
