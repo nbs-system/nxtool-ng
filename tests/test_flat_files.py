@@ -2,7 +2,7 @@ import unittest
 
 from nxtool.log_providers import flat_file
 from nxtool.whitelists_generators import cookies, images_1002, zone_wide, zone_var_wide, url_wide, site_wide_id
-from nxtool.whitelists_generators import google_analytics
+from nxtool.whitelists_generators import google_analytics, zone_var_wide_url, array_like_variables_names
 
 
 class TestFlatFiles(unittest.TestCase):
@@ -22,7 +22,6 @@ class TestParseLog(unittest.TestCase):
         parser.get_relevant_ids = lambda x: [42000227]
         self.assertEqual(cookies.generate_whitelist(parser, []), [{'wl': [42000227], 'mz':['$HEADERS_VAR:cookie'],
                                                                    'msg': 'Cookies that matches a id 42000227'}])
-
     def test_generate_whitelist_images(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
         self.assertEqual(
@@ -86,6 +85,44 @@ class TestParseLog(unittest.TestCase):
         self.assertEqual(google_analytics.generate_whitelist(parser, []),
                          [{'msg': 'Google analytics', 'mz': ['$ARGS_VAR_X:__utm[abctvz]'], 'wl': [1337]}])
 
+    def test_generate_whitelist_zone_var_wide_url(self):
+        parser = flat_file.FlatFile('./tests/data/images_1002.txt')
+        parser.get_relevant_ids = lambda x: [1337]
+        parser.get_top = lambda x: {'1337': 2048}
+        self.assertEqual(zone_var_wide_url.generate_whitelist(parser, []),
+                         [
+                             {
+                                 'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
+                                 'mz': ['$URL:1337|$BODY_VAR:1337'],
+                                 'wl': [1337]
+                             },
+                            {
+                                'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
+                                 'mz': ['$URL:1337|ARGS:1337|NAME'],
+                                 'wl': [1337]
+                            },
+                            {'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
+                                 'mz': ['$URL:1337|$ARGS_VAR:1337'],
+                                 'wl': [1337]
+                             },
+                            {
+                                'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
+                                'mz': ['$URL:1337|BODY:1337|NAME'],
+                                'wl': [1337]
+                            }])
+
+    def test_generate_whitelist_array_like_variables_names(self):
+        parser = flat_file.FlatFile('./tests/data/images_1002.txt')
+        parser.get_relevant_ids = lambda x: [1337]
+        parser.get_top = lambda x: {'1337': 2048}
+        self.assertEqual(array_like_variables_names.generate_whitelist(parser, []), [])
+
+        parser.get_relevant_ids = lambda x: [1310]
+        parser.get_top = lambda x: {'test[1234]': 2048}
+        self.assertEqual(array_like_variables_names.generate_whitelist(parser, []), [
+            {'msg': 'Array-like variable name', 'mz': ['$BODY_VAR_X:test\\[.+\\]'], 'wl': [1310, 1311]},
+            {'msg': 'Array-like variable name', 'mz': ['$ARGS_VAR_X:test\\[.+\\]'],'wl': [1310, 1311]}]
+                                                                       )
 
 class TestFiltering(unittest.TestCase):
     def test_filter_str(self):
