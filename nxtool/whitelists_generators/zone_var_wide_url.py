@@ -12,7 +12,7 @@ def generate_whitelist(provider, whitelists):
     :param log_provider.elastic provider:
     :return:
     """
-    logging.info('Generating \033[1mvar + zone\033[0m rules')
+    logging.info('Generating \033[1mvar + zone + url\033[0m rules')
     res = collections.defaultdict(lambda: collections.defaultdict(dict))
 
     for rule in whitelists:
@@ -23,7 +23,8 @@ def generate_whitelist(provider, whitelists):
         _search = provider.export_search()
         provider.add_filters({'uri': uri})
         for zone in ['ARGS', 'BODY', 'ARGS|NAME', 'BODY|NAME']:
-            logging.debug('Searching for arguments in the zone \033[1m%s\033[0m', zone)
+            logging.debug('Searching for arguments in the zone \033[1m%s\033[0m on the url \033[1m%s\033[0m', zone, uri)
+
             search = provider.export_search()
             provider.add_filters({'zone': zone})
             data = provider.get_top('var_name')
