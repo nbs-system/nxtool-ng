@@ -13,6 +13,7 @@ class TestFlatFiles(unittest.TestCase):
 
 
 class TestParseLog(unittest.TestCase):
+    maxDiff = None
     def test_show_stats(self):
         parser = flat_file.FlatFile()
         parser.get_statistics()
@@ -89,27 +90,27 @@ class TestParseLog(unittest.TestCase):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
         parser.get_relevant_ids = lambda x: [1337]
         parser.get_top = lambda x: {'1337': 2048}
-        self.assertEqual(zone_var_wide_url.generate_whitelist(parser, []),
-                         [
-                             {
-                                 'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
-                                 'mz': ['$URL:1337|$BODY_VAR:1337'],
-                                 'wl': [1337]
-                             },
-                            {
-                                'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
-                                 'mz': ['$URL:1337|ARGS:1337|NAME'],
-                                 'wl': [1337]
-                            },
-                            {'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
-                                 'mz': ['$URL:1337|$ARGS_VAR:1337'],
-                                 'wl': [1337]
-                             },
-                            {
-                                'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
-                                'mz': ['$URL:1337|BODY:1337|NAME'],
-                                'wl': [1337]
-                            }])
+        expected = [
+            {
+                'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
+                'mz': ['$URL:1337|$BODY_VAR:1337'],
+                'wl': [1337]
+            },
+            {
+                'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
+                'mz': ['$URL:1337|ARGS:1337|NAME'],
+                'wl': [1337]
+            },
+            {'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
+             'mz': ['$URL:1337|$ARGS_VAR:1337'],
+             'wl': [1337]
+             },
+            {
+                'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
+                'mz': ['$URL:1337|BODY:1337|NAME'],
+                'wl': [1337]
+            }]
+        self.assertTrue(all(i in zone_var_wide_url.generate_whitelist(parser, []) for i in expected))
 
     def test_generate_whitelist_array_like_variables_names(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
