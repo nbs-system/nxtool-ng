@@ -89,7 +89,8 @@ def main():
 
     # Filtering can be used for any operation
     __filter(source, args.filter, regexp=False, hostname=args.hostname)
-    __filter(source, args.filter_regexp, regexp=True, hostname=args.hostname)
+    if args.filter_regexp:
+        __filter(source, args.filter_regexp, regexp=True, hostname=args.hostname)
 
     if args.stats:
         printers.print_statistics(source.get_statistics())
