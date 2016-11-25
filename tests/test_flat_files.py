@@ -121,8 +121,8 @@ class TestParseLog(unittest.TestCase):
         parser.get_relevant_ids = lambda x: [1310]
         parser.get_top = lambda x: {'test[1234]': 2048}
         self.assertEqual(array_like_variables_names.generate_whitelist(parser, []), [
-            {'msg': 'Array-like variable name', 'mz': ['$BODY_VAR_X:test\\[.+\\]'], 'wl': [1310, 1311]},
-            {'msg': 'Array-like variable name', 'mz': ['$ARGS_VAR_X:test\\[.+\\]'],'wl': [1310, 1311]}]
+            {'msg': 'Array-like variable name', 'mz': ['$BODY_VAR_X:^test\\[.+\\]$'], 'wl': [1310, 1311]},
+            {'msg': 'Array-like variable name', 'mz': ['$ARGS_VAR_X:^test\\[.+\\]$'],'wl': [1310, 1311]}]
                                                                        )
 
 class TestFiltering(unittest.TestCase):

@@ -52,9 +52,9 @@ def generate_whitelist(provider, whitelists):
         if stripped_name not in stripped_names:
             stripped_names.add(stripped_name)
             ret.append({
-                'mz': ['$BODY_VAR_X:%s\[.+\]' % stripped_name],
+                'mz': ['$BODY_VAR_X:^%s\[.+\]$' % stripped_name],
                 'wl': ids, 'msg': 'Array-like variable name'})
             ret.append({
-                'mz': ['$ARGS_VAR_X:%s\[.+\]' % stripped_name],
+                'mz': ['$ARGS_VAR_X:^%s\[.+\]$' % stripped_name],
                 'wl': ids, 'msg': 'Array-like variable name'})
     return ret
