@@ -20,10 +20,8 @@ def generate_whitelist(provider, whitelists):
 
     for zone in ['ARGS', 'BODY', 'ARGS|NAME', 'BODY|NAME']:
         logging.debug('Searching for arguments in the zone \033[1m%s\033[0m', zone)
-        search = provider.export_search()
         provider.add_filters({'zone': zone})
         data = provider.get_top('var_name')
-        provider.import_search(search)
 
         for var_name, nb in data.items():
             if not var_name:
@@ -32,7 +30,7 @@ def generate_whitelist(provider, whitelists):
                 logging.debug('Discarding the argument \033[32m%s\033[0m (%d occurrences)', var_name, nb)
                 continue
             search = provider.export_search()
-            provider.add_filters({'zone': zone, 'var_name': var_name})
+            provider.add_filters({'var_name': var_name})
             res[zone][var_name] = provider.get_relevant_ids(['ip'])  # every peer should have triggered the exception
             provider.import_search(search)
 

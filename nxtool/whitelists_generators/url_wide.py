@@ -22,8 +22,10 @@ def generate_whitelist(provider, whitelists):
     res = collections.defaultdict(set)
     for uri in uris.keys():
         logging.debug('Searching for id in the uri \033[1m%s\033[0m', uri)
+        provider.add_filters({'uri': uri})
+
         search = provider.export_search()
-        provider.add_filters({'uri': uri, 'zone': 'URL'})
+        provider.add_filters({'zone': 'URL'})
         data = provider.get_top('id')
         provider.import_search(search)
 
@@ -35,8 +37,9 @@ def generate_whitelist(provider, whitelists):
                 continue
             else:
                 logging.debug('\033[1mKeeping\033[0m the id \033[32m%s\033[0m (%d occurrences)', id_name, nb)
+
             search = provider.export_search()
-            provider.add_filters({'uri': uri, 'id': id_name})
+            provider.add_filters({'id': id_name})
             if int(id_name) in provider.get_relevant_ids(['ip']):
                 res[uri].add(id_name)
             provider.import_search(search)
