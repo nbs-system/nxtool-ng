@@ -30,7 +30,11 @@ def generate_whitelist(provider, whitelists):
 
     ret = list()
     for zone, _id in res.items():
-        ret.append({'mz': [zone], 'wl': _id, 'msg': 'Site-wide id+zone if it matches %s' % get_description_core(_id)})
+        ret.append({
+            'mz': [zone],
+            'wl': _id,
+            'msg': 'Site-wide id+zone if it matches %s' % ', or a '.join(map(get_description_core, _id))}
+        )
     return ret
 
 

@@ -77,7 +77,7 @@ class TestParseLog(unittest.TestCase):
         parser.get_relevant_ids = lambda x, y: [1337]
         parser.get_top = lambda x: {'1337': 2048}
         self.assertEqual(site_wide_id.generate_whitelist(parser, []),
-                         [{'msg': 'Site-wide id+zone if it matches id [1337]', 'mz': ['1337'], 'wl': [1337]}])
+                         [{'msg': 'Site-wide id+zone if it matches id 1337', 'mz': ['1337'], 'wl': [1337]}])
 
     def test_generate_whitelist_google_analytics(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
