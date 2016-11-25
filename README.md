@@ -1,17 +1,18 @@
-[![Coverage Status](https://coveralls.io/repos/github/nbs-system/nxtool/badge.svg?branch=master)](https://coveralls.io/github/nbs-system/nxtool?branch=master)
-[![Code Health](https://landscape.io/github/nbs-system/nxtool/master/landscape.svg?style=flat)](https://landscape.io/github/nbs-system/nxtool/master)
-[![Build Status](https://travis-ci.org/nbs-system/nxtool.svg?branch=master)](https://travis-ci.org/nbs-system/nxtool)
+[![Coverage Status](https://coveralls.io/repos/github/nbs-system/nxtool-ng/badge.svg?branch=master)](https://coveralls.io/github/nbs-system/nxtool-ng?branch=master)
+[![Code Health](https://landscape.io/github/nbs-system/nxtool-ng/master/landscape.svg?style=flat)](https://landscape.io/github/nbs-system/nxtool-ng/master)
+[![Build Status](https://travis-ci.org/nbs-system/nxtool-ng.svg?branch=master)](https://travis-ci.org/nbs-system/nxtool-ng)
 
 ```
-              __               __ 
- .-----.--.--|  |_.-----.-----|  |
- |     |_   _|   _|  _  |  _  |  |
- |__|__|__.__|____|_____|_____|__|
- 
+              __                __                    
+.-----.--.--.|  |_.-----.-----.|  |______.-----.-----.
+|     |_   _||   _|  _  |  _  ||  |______|     |  _  |
+|__|__|__.__||____|_____|_____||__|      |__|__|___  |
+                                               |_____|
+
  -- Because life is too short to transform naxsi logs into rules by hand.
 ```
           
-nxtool is a tool to magically transform your [naxsi]( http://naxsi.org ) logs into useful rules.
+nxtool-ng is a tool to magically transform your [naxsi]( http://naxsi.org ) logs into useful rules.
 It can get its data from your elastic instance, or you can feed it flat files,
 and it will magically show you some statistics, generate relevant whitelists,
 provide type-based rules, …
@@ -21,12 +22,12 @@ It works with *modules*, that are generating whitelists, without overlapping eac
 Proudly powered by [Python]( https://python.org ) (2 and 3 by the way),
 using (optionally) [elasticsearch-dsl]( https://elasticsearch-dsl.readthedocs.org/en/latest/ ),
 written with love and tears by the great people of [NBS-System]( https://nbs-system.com ),
-nxtools is released under the [GPL]( https://gnu.org/licenses/gpl.html ).
+nxtool-ng is released under the [GPL]( https://gnu.org/licenses/gpl.html ).
 
 # Usage
 
 ```bash
-$ python nxtool.py -h                                                                                                                                             U [master] git:nxtool
+$ python nxtool.py -h
 usage: nxtool.py [-h] [-v] [--elastic] [--flat-file] [--stdin] [--archive]
                  [--typing] [--whitelist] [--filter FILTER] [--stats]
                  [hostname]
@@ -56,8 +57,7 @@ Actions:
 For example, if you want some stats about `example.com` using your elasticsearch instance:
 
 ```bash
-$ python nxtool.py --elastic --stats clusif.fr                                                                                                                    U [master] git:nxtool
-# IP #
+$ python nxtool.py --elastic --stats example.com
 2.39.218.24: 14
 14.76.8.132: 18
 13.24.13.122: 8
@@ -97,7 +97,7 @@ example.com: 536
 To generate some whitelists for `example.com`, using your elasticsearch instance:
 
 ```bash
-$ python nxtool.py --elastic --whitelist example.com                                                                                                               U [master] git:nxtool
+$ python nxtool.py --elastic --whitelist example.com
 [+] Generating Google analytics rules
 [+] Generating Image 1002 rules
 [+] Generating cookies rules
@@ -114,7 +114,7 @@ You can add the `--verbose` flag if you want more information about what's going
 If you're using *flat files*, you can either pass, well flat files, but also *archives*,
 like `.zip` or `.tar.gz`.
 
-You can also use nxtool to query your elasticsearch instance, for example
+You can also use nxtool-ng to query your elasticsearch instance, for example
 to search for access to `/admin`, that triggered the rule `1010` in the `HEADERS`:
 
 ```bash
