@@ -75,7 +75,7 @@ class TestParseLog(unittest.TestCase):
         parser.get_top = lambda x: {'1337': 2048, '123': 2}
         expected = [{'msg': 'url-wide whitelist if it matches a id 1337', 'mz': ['$URL:1337'], 'wl': {'1337'}},
                           {'msg': 'url-wide whitelist if it matches a id 1337', 'mz': ['$URL:123'], 'wl': {'1337'}}]
-        self.assertEqual(url_wide.generate_whitelist(parser, []), expected)
+        self.assertTrue(all(i in url_wide.generate_whitelist(parser, []) for i in expected))
 
         parser.get_relevant_ids = lambda x: []
         parser.get_top = lambda x: {}
