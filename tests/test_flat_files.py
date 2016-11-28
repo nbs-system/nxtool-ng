@@ -62,20 +62,20 @@ class TestParseLog(unittest.TestCase):
         except AttributeError:  # Python2/3 fuckery
             self.assertItemsEqual(zone_var_wide.generate_whitelist(parser, []), expected)
 
-        parser.get_top = lambda x: {'test_var_name': []}
+        parser.get_top = lambda x: {'test_var_name': 0}
         try:
-            self.assertCountEqual(zone_var_wide.generate_whitelist(parser, [{'id':1,'mz': 'BODY'}]), expected)
+            self.assertCountEqual(zone_var_wide.generate_whitelist(parser, [{'id':1, 'mz':'BODY'}]), [])
         except AttributeError:  # Python2/3 fuckery
-            self.assertItemsEqual(zone_var_wide.generate_whitelist(parser, [{'id':1,'mz': 'BODY'}]), expected)
+            self.assertItemsEqual(zone_var_wide.generate_whitelist(parser, [{'id':1, 'mz':'BODY'}]), [])
 
 
     def test_generate_whitelist_url_wide(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
         parser.get_relevant_ids = lambda x: [1337]
         parser.get_top = lambda x: {'1337': 2048, '123': 2}
-        self.assertEqual(url_wide.generate_whitelist(parser, []),
-                         [{'msg': 'url-wide whitelist if it matches a id 1337', 'mz': ['$URL:1337'], 'wl': {'1337'}},
-                          {'msg': 'url-wide whitelist if it matches a id 1337', 'mz': ['$URL:123'], 'wl': {'1337'}}])
+        expected = [{'msg': 'url-wide whitelist if it matches a id 1337', 'mz': ['$URL:1337'], 'wl': {'1337'}},
+                          {'msg': 'url-wide whitelist if it matches a id 1337', 'mz': ['$URL:123'], 'wl': {'1337'}}]
+        self.assertEqual(url_wide.generate_whitelist(parser, []), expected)
 
         parser.get_relevant_ids = lambda x: []
         parser.get_top = lambda x: {}
@@ -97,6 +97,8 @@ class TestParseLog(unittest.TestCase):
         self.assertEqual(google_analytics.generate_whitelist(parser, []),
                          [{'msg': 'Google analytics', 'mz': ['$ARGS_VAR_X:__utm[abctvz]'], 'wl': [1337]}])
         self.assertEqual(google_analytics.generate_whitelist(parser, [{'id':1234}]),
+                         [{'msg': 'Google analytics', 'mz': ['$ARGS_VAR_X:__utm[abctvz]'], 'wl': [1337]}])
+        self.assertEqual(google_analytics.generate_whitelist(parser, [{'wl':1002}]),
                          [{'msg': 'Google analytics', 'mz': ['$ARGS_VAR_X:__utm[abctvz]'], 'wl': [1337]}])
 
     def test_generate_whitelist_zone_var_wide_url(self):
