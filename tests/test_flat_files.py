@@ -23,6 +23,9 @@ class TestParseLog(unittest.TestCase):
         parser.get_relevant_ids = lambda x: [42000227]
         self.assertEqual(cookies.generate_whitelist(parser, []), [{'wl': [42000227], 'mz':['$HEADERS_VAR:cookie'],
                                                                    'msg': 'Cookies that matches a id 42000227'}])
+
+        self.assertEqual(cookies.generate_whitelist(parser, [{'id':1234}]), [{'wl': [42000227], 'mz':['$HEADERS_VAR:cookie'],
+                                                                   'msg': 'Cookies that matches a id 42000227'}])
     def test_generate_whitelist_images(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
         self.assertEqual(
@@ -33,7 +36,7 @@ class TestParseLog(unittest.TestCase):
 
     def test_generate_whitelist_zone_wide(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
-        parser.get_top = lambda x: {1337: 2048} if x =='id' else {'ARGS': 2048}
+        parser.get_top = lambda x: {1337: 2048, '': 1337} if x =='id' else {'ARGS': 2048}
         parser.get_relevant_ids = lambda x: [1337]
         self.assertEqual(zone_wide.generate_whitelist(parser, []),
                          [{'msg': 'zone-wide ID whitelist if it matches a id 1337', 'mz': ['ARGS'], 'wl': {1337}}])
@@ -47,26 +50,32 @@ class TestParseLog(unittest.TestCase):
     def test_generate_whitelist_zone_var_wide(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
         parser.get_relevant_ids = lambda x: [1337]
-        parser.get_top = lambda x: {'test_var_name': 2048}
+        parser.get_top = lambda x: {'test_var_name': 2048, '':123, 'super-test':12}
         expected = [
             {'msg': 'Variable zone-wide if it matches a id 1337', 'mz': ['BODY:test_var_name'], 'wl': [1337]},
             {'msg': 'Variable zone-wide if it matches a id 1337', 'mz': ['ARGS:test_var_name|NAME'], 'wl': [1337]},
             {'msg': 'Variable zone-wide if it matches a id 1337', 'mz': ['ARGS:test_var_name'], 'wl': [1337]},
             {'msg': 'Variable zone-wide if it matches a id 1337', 'mz': ['BODY:test_var_name|NAME'], 'wl': [1337]}
         ]
-        self.maxDiff = 133337
         try:
             self.assertCountEqual(zone_var_wide.generate_whitelist(parser, []), expected)
         except AttributeError:  # Python2/3 fuckery
             self.assertItemsEqual(zone_var_wide.generate_whitelist(parser, []), expected)
 
+        parser.get_top = lambda x: {'test_var_name': []}
+        try:
+            self.assertCountEqual(zone_var_wide.generate_whitelist(parser, [{'id':1,'mz': 'BODY'}]), expected)
+        except AttributeError:  # Python2/3 fuckery
+            self.assertItemsEqual(zone_var_wide.generate_whitelist(parser, [{'id':1,'mz': 'BODY'}]), expected)
+
 
     def test_generate_whitelist_url_wide(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
         parser.get_relevant_ids = lambda x: [1337]
-        parser.get_top = lambda x: {'1337': 2048}
+        parser.get_top = lambda x: {'1337': 2048, '123': 2}
         self.assertEqual(url_wide.generate_whitelist(parser, []),
-                         [{'msg': 'url-wide whitelist if it matches a id 1337', 'mz': ['$URL:1337'], 'wl': {'1337'}}])
+                         [{'msg': 'url-wide whitelist if it matches a id 1337', 'mz': ['$URL:1337'], 'wl': {'1337'}},
+                          {'msg': 'url-wide whitelist if it matches a id 1337', 'mz': ['$URL:123'], 'wl': {'1337'}}])
 
         parser.get_relevant_ids = lambda x: []
         parser.get_top = lambda x: {}
@@ -78,12 +87,16 @@ class TestParseLog(unittest.TestCase):
         parser.get_top = lambda x: {'1337': 2048}
         self.assertEqual(site_wide_id.generate_whitelist(parser, []),
                          [{'msg': 'Site-wide id+zone if it matches id 1337', 'mz': ['1337'], 'wl': [1337]}])
+        self.assertEqual(site_wide_id.generate_whitelist(parser, [{'id':1234}]),
+                         [{'msg': 'Site-wide id+zone if it matches id 1337', 'mz': ['1337'], 'wl': [1337]}])
 
     def test_generate_whitelist_google_analytics(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
         parser.get_relevant_ids = lambda x: [1337]
         parser.get_top = lambda x: {'1337': 2048}
         self.assertEqual(google_analytics.generate_whitelist(parser, []),
+                         [{'msg': 'Google analytics', 'mz': ['$ARGS_VAR_X:__utm[abctvz]'], 'wl': [1337]}])
+        self.assertEqual(google_analytics.generate_whitelist(parser, [{'id':1234}]),
                          [{'msg': 'Google analytics', 'mz': ['$ARGS_VAR_X:__utm[abctvz]'], 'wl': [1337]}])
 
     def test_generate_whitelist_zone_var_wide_url(self):
@@ -124,6 +137,18 @@ class TestParseLog(unittest.TestCase):
             {'msg': 'Array-like variable name', 'mz': ['$BODY_VAR_X:^test\\[.+\\]$'], 'wl': [1310, 1311]},
             {'msg': 'Array-like variable name', 'mz': ['$ARGS_VAR_X:^test\\[.+\\]$'],'wl': [1310, 1311]}]
                                                                        )
+        self.assertEqual(array_like_variables_names.generate_whitelist(parser, [{'id':3, 'mz':'BODY'}]), [
+            {'msg': 'Array-like variable name', 'mz': ['$BODY_VAR_X:^test\\[.+\\]$'], 'wl': [1310, 1311]},
+            {'msg': 'Array-like variable name', 'mz': ['$ARGS_VAR_X:^test\\[.+\\]$'],'wl': [1310, 1311]}]
+                                                                       )
+        parser.get_top = lambda x: {'test[1234]]': 2048}
+        self.assertEqual(array_like_variables_names.generate_whitelist(parser, []), [])
+
+        parser.get_top = lambda x: {'test[[1234]': 2048}
+        self.assertEqual(array_like_variables_names.generate_whitelist(parser, []), [])
+
+        parser.get_top = lambda x: {'test[1234]': 1}
+        self.assertEqual(array_like_variables_names.generate_whitelist(parser, []), [])
 
 class TestFiltering(unittest.TestCase):
     def test_filter_str(self):
