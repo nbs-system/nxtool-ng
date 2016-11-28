@@ -9,4 +9,6 @@ omit =
     */site-packages/nose/*
     *__init__*
     tests/*
+	printers.py
+	log_providers/elastic.py
     *nxapi*
