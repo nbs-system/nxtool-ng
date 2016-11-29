@@ -39,6 +39,9 @@ class Elastic(LogProvider):
     def import_search(self, search):
         self.search = search
 
+    def get_filters(self):
+        return self.search.to_dict()
+
     def add_filters(self, filters, regexp=False, negative=False):
         """
         Add `filters` to the query.
