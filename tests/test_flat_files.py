@@ -104,7 +104,7 @@ class TestParseLog(unittest.TestCase):
     def test_generate_whitelist_zone_var_wide_url(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
         parser.get_relevant_ids = lambda x: [1337]
-        parser.get_top = lambda x: {'1337': 2048}
+        parser.get_top = lambda x: {'1337': 2048, '': 123, 'test': 1}
         expected = [
             {
                 'msg': 'Variable zone-wide on a specific url if it matches a id 1337',
@@ -125,7 +125,7 @@ class TestParseLog(unittest.TestCase):
                 'mz': ['$URL:1337|BODY:1337|NAME'],
                 'wl': [1337]
             }]
-        self.assertTrue(all(i in zone_var_wide_url.generate_whitelist(parser, []) for i in expected))
+        self.assertTrue(all(i in zone_var_wide_url.generate_whitelist(parser, [{'id':123}]) for i in expected))
 
     def test_generate_whitelist_array_like_variables_names(self):
         parser = flat_file.FlatFile('./tests/data/images_1002.txt')
