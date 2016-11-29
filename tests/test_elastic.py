@@ -34,3 +34,23 @@ class TestElastic(unittest.TestCase):
         parser = elastic.Elastic()
         parser.add_filters({'pif': []}, negative=True)
         self.assertEqual(parser.get_filters(), {'query': {'match_all': {}}, 'size': 10000})
+
+        parser = elastic.Elastic()
+        parser.add_filters({'pif': set()}, negative=True)
+        self.assertEqual(parser.get_filters(), {'query': {'match_all': {}}, 'size': 10000})
+
+        parser = elastic.Elastic()
+        parser.add_filters({'pif': 'paf'}, negative=True)
+        self.assertEqual(parser.get_filters(), {'query': {'bool':
+                                                              {'must_not':
+                                                                   [
+                                                                       {'multi_match': {'fields': ['pif'], 'query': 'paf'}}
+                                                                   ]}},
+                                                'size': 10000})
+
+    def test_reset_filters(self):
+        parser = elastic.Elastic()
+        search = parser.get_filters()
+        parser.add_filters({'pif': 'paf'})
+        parser.reset_filters()
+        self.assertEqual(parser.get_filters(), search)
