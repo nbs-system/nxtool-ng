@@ -39,6 +39,12 @@ class TestElastic(unittest.TestCase):
         parser.add_filters({'pif': set()}, negative=True)
         self.assertEqual(parser.get_filters(), {'query': {'match_all': {}}, 'size': 10000})
 
+
+        parser = elastic.Elastic()
+        parser.add_filters({'pif': [1,]}, negative=True)
+        self.assertEqual(parser.get_filters(),  {'query': {'bool': {'must_not': [
+            {'multi_match': {'fields': ['pif'],'query': 1}}]}}, 'size': 10000})
+
         parser = elastic.Elastic()
         parser.add_filters({'pif': 'paf'}, negative=True)
         self.assertEqual(parser.get_filters(), {'query': {'bool':
@@ -54,3 +60,11 @@ class TestElastic(unittest.TestCase):
         parser.add_filters({'pif': 'paf'})
         parser.reset_filters()
         self.assertEqual(parser.get_filters(), search)
+
+    def test_get_results(self):
+        parser = elastic.Elastic()
+        parser.search.scan = lambda : None
+        parser.add_filters({'pif': 'paf'})
+        filters = parser.get_filters()
+        parser.get_results()
+        self.assertEqual(parser.get_filters(), filters)
