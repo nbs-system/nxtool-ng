@@ -3,11 +3,11 @@
 [![Build Status](https://travis-ci.org/nbs-system/nxtool-ng.svg?branch=master)](https://travis-ci.org/nbs-system/nxtool-ng)
 
 ```
-              __                __                    
-.-----.--.--.|  |_.-----.-----.|  |______.-----.-----.
-|     |_   _||   _|  _  |  _  ||  |______|     |  _  |
-|__|__|__.__||____|_____|_____||__|      |__|__|___  |
-                                               |_____|
+              __                __                  
+.-----.--.--.|  |_.-----.-----.|  |____.-----.-----.
+|     |_   _||   _|  _  |  _  ||  |____|     |  _  |
+|__|__|__.__||____|_____|_____||__|    |__|__|___  |
+                                             |_____|
 
  -- Because life is too short to transform naxsi logs into rules by hand.
 ```
@@ -23,6 +23,13 @@ Proudly powered by [Python]( https://python.org ) (2 and 3 by the way),
 using (optionally) [elasticsearch-dsl]( https://elasticsearch-dsl.readthedocs.org/en/latest/ ),
 written with love and tears by the great people of [NBS-System]( https://nbs-system.com ),
 nxtool-ng is released under the [GPL]( https://gnu.org/licenses/gpl.html ).
+
+# Installation
+
+Nxtool-ng depends on [nxapi](https://github.com/nbs-system/nxapi) for naxsi-related magic,
+and optionally on [elasticsearch-dsl]( https://github.com/elastic/elasticsearch-dsl-py )
+if you want to generate rules from an Elastic instance. You can install them with
+`pip install -r ./requirements.txt`.
 
 # Usage
 
