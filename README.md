@@ -1,5 +1,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/nbs-system/nxtool-ng/badge.svg?branch=master)](https://coveralls.io/github/nbs-system/nxtool-ng?branch=master)
 [![Code Health](https://landscape.io/github/nbs-system/nxtool-ng/master/landscape.svg?style=flat)](https://landscape.io/github/nbs-system/nxtool-ng/master)
+[![Code Climate](https://codeclimate.com/github/nbs-system/nxtool-ng/badges/gpa.svg)](https://codeclimate.com/github/nbs-system/nxtool-ng)
 [![Build Status](https://travis-ci.org/nbs-system/nxtool-ng.svg?branch=master)](https://travis-ci.org/nbs-system/nxtool-ng)
 
 ```
