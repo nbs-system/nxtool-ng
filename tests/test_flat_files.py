@@ -15,7 +15,7 @@ class TestFlatFiles(unittest.TestCase):
 class TestParseLog(unittest.TestCase):
     maxDiff = None
     def test_show_stats(self):
-        parser = flat_file.FlatFile()
+        parser = flat_file.FlatFile('tests/data/logs.txt')
         parser.get_statistics()
 
     def test_generate_whitelist_cookies(self):

@@ -12,26 +12,27 @@ from nxtool.log_providers import LogProvider
 
 
 class FlatFile(LogProvider):
-    def __init__(self, fname='./tests/data/logs.txt'):
+    def __init__(self, fname=None):
         self.logs = list()
         self.filters = collections.defaultdict(list)
         self.negative_filters = collections.defaultdict(list)
         self.filters_regexp = collections.defaultdict(list)
         self.negative_filters_regexp = collections.defaultdict(list)
+        self.fname = fname
 
         try:
-            ftype = mimetypes.guess_all_extensions(fname)[0]
-        except AttributeError:  # `fname` is None
-            self.__transform_logs(fileinput.input(fname))
-        except IndexError:  # `fname` has no guessable mimtype
-            self.__transform_logs(fileinput.input(fname))
+            ftype = mimetypes.guess_all_extensions(self.fname)[0]
+        except AttributeError:  # `self.fname` is None
+            self.__transform_logs(fileinput.input(self.fname))
+        except IndexError:  # `self.fname` has no guessable mimtype
+            self.__transform_logs(fileinput.input(self.fname))
         else:
             if ftype == 'application/zip':  # zip file!
-                with zipfile.ZipFile(fname) as f:
+                with zipfile.ZipFile(self.fname) as f:
                     for name in f.namelist():
                         self.__transform_logs(f.read(name))
             elif ftype == 'application/tar':  # tar file!
-                with tarfile.open(fname) as f:
+                with tarfile.open(self.fname) as f:
                     for name in f.namelist():
                         self.__transform_logs(f.read(name))
 
@@ -113,7 +114,7 @@ class FlatFile(LogProvider):
                     else:
                         self.filters[key].append(value)
 
-    def get_relevant_ids(self, fields, percentage=10.0, minimum_occurences=1000):
+    def get_relevant_ids(self, fields, percentage=10.0, minimum_occurences=1):
         """
          We want to keep alerts that are spread over a vast number of different`fields`
 

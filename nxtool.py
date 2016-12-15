@@ -50,7 +50,7 @@ def __create_argparser():
 
     log_sources = parser.add_argument_group('Log sources')
     log_sources.add_argument('--elastic', action='store_true')
-    log_sources.add_argument('--flat-file', action='store_true')
+    log_sources.add_argument('--flat-file', type=str)
     log_sources.add_argument('--stdin', action='store_true')
     log_sources.add_argument('--archive', action='store_true')
 
@@ -79,10 +79,10 @@ def main():
             print('You asked for an elastic source, but you do not have the required dependencies.')
             return
         source = elastic.Elastic()
-    elif args.flat_file is True:
-        source = flat_file.FlatFile()
+    elif args.flat_file:
+        source = flat_file.FlatFile(args.flat_file)
     elif args.stdin is True:
-        source = flat_file.FlatFile(None)
+        source = flat_file.FlatFile()
     else:
         print('Please give me a valid source (or try to relaunch me with `-h` if you are lost).')
         return 1
