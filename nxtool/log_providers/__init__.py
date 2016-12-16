@@ -28,3 +28,13 @@ class LogProvider(object):
         :return dict of str: {field: nb_occurences, ..}
         """
         raise NotImplementedError
+
+    def get_relevant_ids(self, fields, percentage=10.0, minimum_occurences=250):
+        """ This function is supposed to return the id that are reparteed/present on the `fields`.
+
+        :param str fields:
+        :param float percentage:
+        :param int minimum_occurences:
+        :return set:
+        """
+        raise NotImplementedError

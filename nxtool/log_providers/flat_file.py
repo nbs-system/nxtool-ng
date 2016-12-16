@@ -114,7 +114,7 @@ class FlatFile(LogProvider):
                     else:
                         self.filters[key].append(value)
 
-    def get_relevant_ids(self, fields, percentage=10.0, minimum_occurences=1):
+    def get_relevant_ids(self, fields, percentage=10.0, minimum_occurences=250):
         """
          We want to keep alerts that are spread over a vast number of different`fields`
 
@@ -134,7 +134,7 @@ class FlatFile(LogProvider):
 
             for k, v in stats.items():
                 if size < minimum_occurences:
-                    logging.debug('The field %s has not enough occurences (%d): non-significant', field, size)
+                    logging.debug('The field %s has not enough occurrences (%d): non-significant', field, size)
                     continue
                 if v < size / percentage:
                     logging.debug('The id %s is present in less than 10%% (%d) of %s : non-significant.', k, v, field)
