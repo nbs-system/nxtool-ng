@@ -90,12 +90,12 @@ class Elastic(LogProvider):
         self.search = search
         return ret
 
-    def get_relevant_ids(self, fields, percentage=10.0, minimum_occurences=250):
+    def get_relevant_ids(self, fields, percentage=10.0, minimum_occurrences=250):
         """ This function is supposed to return the id that are reparteed/present on the `fields`.
 
          :param list of str fields:
          :param float percentage:
-         :param float minimum_occurences:
+         :param float minimum_occurrences:
          :return set of int:
          """
         ret = set()
@@ -116,7 +116,7 @@ class Elastic(LogProvider):
                 for field in fields:
                     data[field].add(res[field])
 
-            if step < minimum_occurences:
+            if step < minimum_occurrences:
                 logging.debug('Discarding id \033[32m%s\033[0m only present %d times.', _id, step)
                 continue
 

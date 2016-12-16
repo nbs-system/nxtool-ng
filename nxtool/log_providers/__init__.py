@@ -25,16 +25,16 @@ class LogProvider(object):
 
         :param str field: On what field we want to filter
         :param int size: On how much data do we want to process
-        :return dict of str: {field: nb_occurences, ..}
+        :return dict of str: {field: nb_occurrences, ..}
         """
         raise NotImplementedError
 
-    def get_relevant_ids(self, fields, percentage=10.0, minimum_occurences=250):
+    def get_relevant_ids(self, fields, percentage=10.0, minimum_occurrences=250):
         """ This function is supposed to return the id that are reparteed/present on the `fields`.
 
         :param str fields:
         :param float percentage:
-        :param int minimum_occurences:
+        :param int minimum_occurrences:
         :return set:
         """
         raise NotImplementedError
