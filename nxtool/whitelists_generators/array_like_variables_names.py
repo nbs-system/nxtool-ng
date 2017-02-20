@@ -24,7 +24,7 @@ def generate_whitelist(provider, whitelists):
     Generate whitelists for variables that look like an array, eg. `pouet[1]`, `pouet[1[2]3]`, or `pouet[1][2]`.
 
     :param provider: The data provider
-    :param list whitelist: Already generated rules, acting as a whitelist
+    :param list whitelists: Already generated rules, acting as a whitelist
     :return list of dict: The generated whitelists
     """
     ids = [1310, 1311]  # [ and ]

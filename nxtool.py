@@ -33,7 +33,7 @@ def __whitelist_from_rules(source, rules):
         for matchzone in rule.get('mz', '*')[0].split('|'):
             try:
                 zone, value = matchzone.split(':')
-            except ValueError:
+            except ValueError:  # no ':', it's a simple matchzone
                 whitelist['zone'] = matchzone
                 continue
 
@@ -129,7 +129,6 @@ def main():
         else:
             print('\n\033[1mnxtool was not able to generate meaningful whitelist\033[0m')
     elif args.typing:
-        print('\n\033[1mGenerated types:\033[0m\n')
         printers.print_typed_rules(typing.typification(source))
     else:
         print(printers.print_generic(source.get_results()))

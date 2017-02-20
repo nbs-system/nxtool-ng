@@ -9,6 +9,7 @@ def generate_whitelist(provider, whitelists):
     """
 
     :param log_provider.elastic provider:
+    :param list whitelists:
     :return:
     """
     logging.info('Generating \033[1msite\033[0m rules')

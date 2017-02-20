@@ -24,5 +24,6 @@ def print_typed_rules(results):
     :param list of str results:
     :return:
     """
+    print('\n\033[1mGenerated types:\033[0m')
     for rule in results:
         print('BasicRule negative "rx:%s" "msg:%s" "mz:%s:%s" "s:BLOCK";' % tuple(rule))
