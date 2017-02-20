@@ -15,9 +15,6 @@ def generate_whitelist(provider, whitelists):
     """
     logging.info('Generating \033[1mcookies\033[0m rules')
 
-    for rule in whitelists:
-        provider.add_filters({'id': rule.get('wl', '*'), 'mz': rule.get('mz', '*')}, negative=True)
-
     provider.add_filters({'zone': 'HEADERS', 'var_name': 'cookie'})
 
     # We don't require the hits to be spread across users, because the cookie might be only available

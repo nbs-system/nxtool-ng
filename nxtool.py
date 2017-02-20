@@ -23,6 +23,29 @@ except ImportError:
     elastic_imported = False
 
 
+def __whitelist_from_rules(source, rules):
+    """
+    :param source:
+    :param dict rules:
+    """
+    for rule in rules:
+        whitelist = {'id': rule.get('wl', '*')}
+        for matchzone in rule.get('mz', '*')[0].split('|'):
+            try:
+                zone, value = matchzone.split(':')
+            except ValueError:
+                whitelist['zone'] = matchzone
+                continue
+
+            if zone == '$URL':
+                whitelist['url'] = value
+            elif zone.startswith('$') and zone.endswith('_VAR'):  # stuff like `$ARGS_VAR:variable_name`
+                whitelist['zone'] = zone[1:-4]
+                whitelist['var_name'] = value
+
+        source.add_filters(whitelist, regexp=False)
+
+
 def __filter(source, filters, regexp=False, hostname=''):
     _filter = {}
 
@@ -97,7 +120,9 @@ def main():
     elif args.whitelist:
         whitelist = list()
         for module in WL_MODULES:
-            whitelist.extend(module.generate_whitelist(source, whitelist))
+            rules = module.generate_whitelist(source, whitelist)
+            whitelist.extend(rules)
+            __whitelist_from_rules(source, rules)
         if whitelist:
             print('\n\033[1mGenerated whitelists:\033[0m')
             print('\t' + ';\n\t'.join(map(nxapi_whitelist.dict_to_str,  whitelist)))

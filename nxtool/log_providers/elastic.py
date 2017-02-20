@@ -48,6 +48,8 @@ class Elastic(LogProvider):
          `filters is a dict of the form {'field': value, field2: value2}, but you can also use a list of values
          instead of a `str`. They'll be added as a _or_ (and not a _and_).
         :param dict filters:
+        :param bool regexp:
+        :param bool negative:
         :return:
         """
         # We need to use multi_match, since we get the fields names dynamically.

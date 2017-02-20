@@ -16,9 +16,6 @@ def generate_whitelist(provider, whitelists):
     logging.info('Generating \033[1mzone\033[0m rules')
     zones = provider.get_top('zone')
 
-    for rule in whitelists:
-        provider.add_filters({'id': rule.get('wl', '*'), 'mz': rule.get('mz', '*')}, negative=True)
-
     res = collections.defaultdict(set)
     for zone in zones.keys():
         logging.debug('Searching for id in the zone \033[1m%s\033[0m', zone)

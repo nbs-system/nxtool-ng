@@ -15,9 +15,6 @@ def generate_whitelist(provider, whitelists):
     logging.info('Generating \033[1mvar + zone\033[0m rules')
     res = collections.defaultdict(dict)
 
-    for rule in whitelists:
-        provider.add_filters({'id': rule.get('wl', '*'), 'mz': rule.get('mz', '*')}, negative=True)
-
     for zone in ['ARGS', 'BODY', 'ARGS|NAME', 'BODY|NAME']:
         logging.debug('Searching for arguments in the zone \033[1m%s\033[0m', zone)
         provider.add_filters({'zone': zone})

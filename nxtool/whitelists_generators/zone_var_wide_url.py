@@ -15,9 +15,6 @@ def generate_whitelist(provider, whitelists):
     logging.info('Generating \033[1mvar + zone + url\033[0m rules')
     res = collections.defaultdict(lambda: collections.defaultdict(dict))
 
-    for rule in whitelists:
-        provider.add_filters({'id': rule.get('wl', '*'), 'mz': rule.get('mz', '*')}, negative=True)
-
     for uri in provider.get_top('uri').keys():
         _search = provider.export_search()
         provider.add_filters({'uri': uri})

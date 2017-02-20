@@ -14,9 +14,6 @@ def generate_whitelist(provider, whitelists):
     logging.info('Generating \033[1msite\033[0m rules')
     zones = provider.get_top('zone')
 
-    for rule in whitelists:
-        provider.add_filters({'id': rule.get('wl', '*'), 'mz': rule.get('mz', '*')}, negative=True)
-
     res = dict()
     for zone in zones.keys():
         logging.debug('Generating \033[1murl_wide_id\033[0m rules for \033[1m%s\033[0m', zone)
