@@ -109,20 +109,20 @@ class Elastic(LogProvider):
             self.add_filters({'id': _id})
 
             # Get how many different fields there are for a given `id`
-            step = 0.0
             data = collections.defaultdict(set)
+            fields_counter = collections.defaultdict(int)
             for res in self.search.execute():
-                step += 1.0
                 for field in fields:
+                    if res[field] not in data[field]:
+                        fields_counter[field] += 1.0
                     data[field].add(res[field])
-
-            if step < minimum_occurrences:
-                logging.debug('Discarding id \033[32m%s\033[0m only present %d times.', _id, step)
-                continue
 
             # Ignore id that are present on less than 10% of different values of each fields
             for field, content in data.items():
-                _percentage = len(content) / step * 100.0
+                if len(content) < minimum_occurrences:
+                    logging.debug('Discarding id \033[32m%s\033[0m only present %d times.', _id, len(content))
+                    continue
+                _percentage = len(content) / fields_counter[field] * 100.0
                 if _percentage > percentage:
                     continue
                 logging.debug('Discarding id \033[32m%s\033[0m present in %d%% of different values of the \033[32m%s\033[0m field', _id, _percentage, field)
