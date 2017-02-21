@@ -125,7 +125,7 @@ def main():
             __whitelist_from_rules(source, rules)
         if whitelist:
             print('\n\033[1mGenerated whitelists:\033[0m')
-            print('\t' + ';\n\t'.join(map(nxapi_whitelist.dict_to_str,  whitelist)))
+            print('\t' + ';\n\t'.join(map(nxapi_whitelist.dict_to_str,  whitelist)) + ';')
         else:
             print('\n\033[1mnxtool was not able to generate meaningful whitelist\033[0m')
     elif args.typing:
