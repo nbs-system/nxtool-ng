@@ -72,10 +72,13 @@ def __create_argparser():
     parser.add_argument('-v', '--verbose', action='store_true')
 
     log_sources = parser.add_argument_group('Log sources')
-    log_sources.add_argument('--elastic', action='store_true')
+    log_sources.add_argument('--elastic-source', action='store_true')
     log_sources.add_argument('--flat-file', type=str)
     log_sources.add_argument('--stdin', action='store_true')
     log_sources.add_argument('--archive', action='store_true')
+
+    log_destinations = parser.add_argument_group('Log destinations')
+    log_destinations.add_argument('--elastic-dest', action='store_true')
 
     actions = parser.add_argument_group('Actions')
     actions.add_argument('--typing', action='store_true')
@@ -98,7 +101,7 @@ def main():
     else:
         logging.basicConfig(level=logging.INFO, format='[+] %(message)s')
 
-    if args.elastic is True:
+    if args.elastic_source is True:
         if elastic_imported is False:
             print('You asked for an elastic source, but you do not have the required dependencies.')
             return
@@ -120,7 +123,13 @@ def main():
     if args.filter_regexp:
         __filter(source, args.filter_regexp, regexp=True, hostname=args.hostname)
 
-    if args.stats:
+    if args.elastic_dest:
+        destination = elastic.Elastic()
+        destination.set_mappings()
+        for log in source.logs:
+            destination.insert([log])
+        destination.stop()
+    elif args.stats:
         printers.print_statistics(source.get_statistics())
     elif args.whitelist:
         whitelist = list()
