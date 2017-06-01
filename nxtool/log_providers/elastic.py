@@ -22,6 +22,10 @@ from nxtool.log_providers import LogProvider
 
 class Elastic(LogProvider):
     def __init__(self, config_file='config.cfg'):
+        self.percentage=10.0
+        self.minimum_occurrences=250
+        
+        
         config = ConfigParser({'host': '127.0.0.1', 'use_ssl': True, 'index': 'nxapi', 'version': 2})
         config.read(config_file)
 
@@ -92,7 +96,7 @@ class Elastic(LogProvider):
         self.search = search
         return ret
 
-    def get_relevant_ids(self, fields, percentage=10.0, minimum_occurrences=250):
+    def get_relevant_ids(self, fields, percentage=None, minimum_occurrences=None):
         """ This function is supposed to return the id that are reparteed/present on the `fields`.
 
          :param list of str fields:
@@ -100,6 +104,9 @@ class Elastic(LogProvider):
          :param float minimum_occurrences:
          :return set of int:
          """
+        minimum_occurences = minimum_occurrences or self.minimum_occurrences
+        percentage = percentage or self.percentage
+
         ret = set()
         search = self.search
         ids = set(int(i['id']) for i in self.search.execute())  # get all possible ID
