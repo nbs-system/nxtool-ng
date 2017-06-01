@@ -175,13 +175,6 @@ class Elastic(LogProvider):
         self.search = search
         return result
 
-    def insert(self, obj):
-        self.nlist.extend(obj)
-        if self.auto_commit > 0 and len(self.nlist) > self.auto_commit:
-            return self.commit()
-        return True
-
-
     def commit(self):
         """Process list of dict (yes) and push them to DB """
         self.total_objs += len(self.nlist)
