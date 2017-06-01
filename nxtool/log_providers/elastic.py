@@ -181,67 +181,6 @@ class Elastic(LogProvider):
             return self.commit()
         return True
 
-    def set_mappings(self):
-        if self.version == '5':
-            try:
-                self.client.indices.create(index=self.index,ignore=400) # Ignore 400 cause by IndexAlreadyExistsException when creating an index
-            except Exception as idxadd_error:
-                print(' '.join(("Unable to create the index/collection for ES 5.X: ", self.index, ",", "events", ", Error: ", str(idxadd_error))))
-            try:
-                self.client.indices.put_mapping(
-                    index=self.index,
-                    doc_type=self.doc_type,
-                    body={
-                        "events" : {
-                            # * (Note: The _timestamp and _ttl fields were deprecated and are now removed in ES 5.X.
-                            # deleting documents from an index is very expensive compared to deleting whole indexes.
-                            # That is why time based indexes are recommended over this sort of thing and why
-                            # _ttl was deprecated in the first place)
-                            #"_ttl" : { "enabled" : "true", "default" : "4d" },
-                            "properties" : { "var_name" : {"type": "keyword"},
-                                "uri" : {"type": "keyword"},
-                                "zone" : {"type": "keyword"},
-                                "server" : {"type": "keyword"},
-                                "whitelisted" : {"type" : "keyword"},
-                                "ip" : {"type" : "keyword"}
-                            }
-                        }
-                })
-            except Exception as mapset_error:
-                print("Unable to set mapping on index/collection for ES 5.X: "+self.index+" "+self.doc_type+", Error: "+str(mapset_error))
-                return
-        else:
-            try:
-                self.client.create(
-                    index=self.index,
-                    doc_type=self.doc_type,
-                    #            id=repo_name,
-                    body={},
-                    ignore=409 # 409 - conflict - would be returned if the document is already there
-                )
-            except Exception as idxadd_error:
-                print("Unable to create the index/collection : "+self.index+" "+ self.doc_type+", Error: "+str(idxadd_error))
-                return
-            try:
-                self.client.indices.put_mapping(
-                    index=self.index,
-                    doc_type="events",
-                    body={
-                        "events" : {
-                            "_ttl" : { "enabled" : "true", "default" : "4d" },
-                            "properties" : { "var_name" : {"type": "string", "index":"not_analyzed"},
-                                        "uri" : {"type": "string", "index":"not_analyzed"},
-                                        "zone" : {"type": "string", "index":"not_analyzed"},
-                                        "server" : {"type": "string", "index":"not_analyzed"},
-                                        "whitelisted" : {"type" : "string", "index":"not_analyzed"},
-                                        "content" : {"type" : "string", "index":"not_analyzed"},
-                                        "ip" : { "type" : "string", "index":"not_analyzed"}
-                            }
-                        }
-                })
-            except Exception as mapset_error:
-                print("Unable to set mapping on index/collection : "+self.index+" "+self.doc_type+", Error: "+str(mapset_error))
-                return
 
     def commit(self):
         """Process list of dict (yes) and push them to DB """

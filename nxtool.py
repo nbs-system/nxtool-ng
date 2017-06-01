@@ -125,7 +125,6 @@ def main():
 
     if args.elastic_dest:
         destination = elastic.Elastic()
-#        destination.set_mappings()
         for log in source.logs:
             destination.insert([log])
         destination.stop()
