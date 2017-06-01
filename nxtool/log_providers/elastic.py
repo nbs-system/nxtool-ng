@@ -96,7 +96,7 @@ class Elastic(LogProvider):
         self.search = search
         return ret
 
-    def get_relevant_ids(self, fields, percentage=None, minimum_occurrences=None):
+    def get_relevant_ids(self, fields, percentage=0, minimum_occurrences=0):
         """ This function is supposed to return the id that are reparteed/present on the `fields`.
 
          :param list of str fields:

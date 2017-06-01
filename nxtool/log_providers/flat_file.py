@@ -117,7 +117,7 @@ class FlatFile(LogProvider):
                     else:
                         self.filters[key].append(value)
 
-    def get_relevant_ids(self, fields, percentage=None, minimum_occurrences=None):
+    def get_relevant_ids(self, fields, percentage=0, minimum_occurrences=0):
         """
          We want to keep alerts that are spread over a vast number of different`fields`
 
