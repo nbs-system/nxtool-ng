@@ -60,6 +60,7 @@ Actions:
   --whitelist
   --filter FILTER
   --stats
+  --slack
 ```
 
 For example, if you want some stats about `example.com` using your elasticsearch instance:
@@ -121,6 +122,9 @@ Generated whitelists:
 You can add the `--verbose` flag if you want more information about what's going on.
 If you're using *flat files*, you can either pass, well flat files, but also *archives*,
 like `.zip` or `.tar.gz`.
+
+You can add the `--slack` flag if you want loosen constraints on whitelist generation.
+It can be useful with only little amount of logs.
 
 You can also use nxtool-ng to query your elasticsearch instance, for example
 to search for access to `/admin`, that triggered the rule `1010` in the `HEADERS`:

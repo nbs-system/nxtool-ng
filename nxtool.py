@@ -72,14 +72,18 @@ def __create_argparser():
     parser.add_argument('-v', '--verbose', action='store_true')
 
     log_sources = parser.add_argument_group('Log sources')
-    log_sources.add_argument('--elastic', action='store_true')
+    log_sources.add_argument('--elastic-source', action='store_true')
     log_sources.add_argument('--flat-file', type=str)
     log_sources.add_argument('--stdin', action='store_true')
     log_sources.add_argument('--archive', action='store_true')
 
+    log_destinations = parser.add_argument_group('Log destinations')
+    log_destinations.add_argument('--elastic-dest', action='store_true')
+
     actions = parser.add_argument_group('Actions')
     actions.add_argument('--typing', action='store_true')
     actions.add_argument('--whitelist', action='store_true')
+    actions.add_argument('--slack', action='store_true')
     actions.add_argument('--filter', action='store')
     actions.add_argument('--filter-regexp', action='store')
     actions.add_argument('--stats', action='store_true')
@@ -97,7 +101,7 @@ def main():
     else:
         logging.basicConfig(level=logging.INFO, format='[+] %(message)s')
 
-    if args.elastic is True:
+    if args.elastic_source is True:
         if elastic_imported is False:
             print('You asked for an elastic source, but you do not have the required dependencies.')
             return
@@ -110,16 +114,27 @@ def main():
         print('Please give me a valid source (or try to relaunch me with `-h` if you are lost).')
         return 1
 
+    if args.slack and not args.whitelist:
+        print('You asked for loosen constraints on whitelist generation but you did''nt ask for whitelist generation.')
+        return
+    
     # Filtering can be used for any operation
     __filter(source, args.filter, regexp=False, hostname=args.hostname)
     if args.filter_regexp:
         __filter(source, args.filter_regexp, regexp=True, hostname=args.hostname)
 
-    if args.stats:
+    if args.elastic_dest:
+        destination = elastic.Elastic()
+        for log in source.logs:
+            destination.insert([log])
+        destination.stop()
+    elif args.stats:
         printers.print_statistics(source.get_statistics())
     elif args.whitelist:
         whitelist = list()
         for module in WL_MODULES:
+            if args.slack:
+                source.minimum_occurences = 0
             rules = module.generate_whitelist(source, whitelist)
             whitelist.extend(rules)
             __whitelist_from_rules(source, rules)

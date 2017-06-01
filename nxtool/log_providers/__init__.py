@@ -1,4 +1,10 @@
 class LogProvider(object):
+    def __init__(self, auto_commit_limit=400):
+        self.nlist = list()
+        self.auto_commit = auto_commit_limit
+        self.total_objs = 0
+        self.total_commits = 0
+        
     def add_filters(self, filters, regexp=False, negative=False):
         """
         :param dict filters: What fields/values do we want to filter on?
@@ -38,3 +44,23 @@ class LogProvider(object):
         :return set:
         """
         raise NotImplementedError
+
+    def insert(self, obj):
+        """ This function adds the object obj to the instance of LogProvider.
+        :param obj: object to add to this instance
+        :return bool: Success ?
+        """
+        self.nList.extend(obj)
+        if self.auto_commit > 0 and len(self.nlist) > self.auto_commit:
+            return self.commit()
+        return True
+
+    def commit(self):
+        """ This function commits pendants objects in the LogProvider instance
+
+        """
+        raise NotImplementedError
+
+    def stop(self):
+        self.commit()
+    

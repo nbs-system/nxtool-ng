@@ -13,6 +13,10 @@ from nxtool.log_providers import LogProvider
 
 class FlatFile(LogProvider):
     def __init__(self, fname=None):
+        super(LogProvider, self)
+
+        self.minimum_occurrences = 250
+        self.percentage = 10
         self.logs = list()
         self.filters = collections.defaultdict(list)
         self.negative_filters = collections.defaultdict(list)
@@ -114,7 +118,7 @@ class FlatFile(LogProvider):
                     else:
                         self.filters[key].append(value)
 
-    def get_relevant_ids(self, fields, percentage=10.0, minimum_occurrences=250):
+    def get_relevant_ids(self, fields, percentage=0, minimum_occurrences=0):
         """
          We want to keep alerts that are spread over a vast number of different`fields`
 
@@ -122,6 +126,9 @@ class FlatFile(LogProvider):
         :param list of str fields:
         :return:
         """
+        minimum_occurences = minimum_occurrences or self.minimum_occurrences
+        percentage = percentage or self.percentage
+        
         id_blacklist = set()
         ret = set()
         for field in fields:
