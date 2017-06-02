@@ -87,10 +87,6 @@ class FlatFile(LogProvider):
 
     def add_filters(self, filters, regexp=False, negative=False):  # TODO: simplify this shit
         for key, value in filters.items():
-            if key == 'zone':
-                key = 'zone0'
-            elif key == 'var_name':
-                key = 'var_name0'
             if negative is True:
                 if isinstance(value, list):
                     if regexp is True:
@@ -131,8 +127,8 @@ class FlatFile(LogProvider):
             stats = collections.defaultdict(int)
             size = 0
             for logline in self.get_results():
-                if logline['id0'] not in id_blacklist:
-                    stats[logline['id0']] += 1
+                if logline['id'] not in id_blacklist:
+                    stats[logline['id']] += 1
                 size += 1
 
             for k, v in stats.items():

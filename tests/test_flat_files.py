@@ -156,18 +156,18 @@ class TestFiltering(unittest.TestCase):
     def test_filter_str(self):
         parser = flat_file.FlatFile('./tests/data/cookies.txt')
         self.assertEquals([i for i in parser.get_results()][0], {'block': '0',
-           'cscore0': '$UWA', 'id0': '42000227', 'ip': 'X.X.X.X', 'learning': '0', 'score0': '8',
+           'cscore0': '$UWA', 'id': '42000227', 'ip': 'X.X.X.X', 'learning': '0', 'score0': '8',
            'server': 'Y.Y.Y.Y', 'total_blocked': '204', 'total_processed': '472',
-           'uri': '/phpMyAdmin-2.8.2/scripts/setup.php', 'var_name0': 'cookie', 'vers': '0.52', 'zone0': 'HEADERS'}
+           'uri': '/phpMyAdmin-2.8.2/scripts/setup.php', 'var_name': 'cookie', 'vers': '0.52', 'zone': 'HEADERS'}
         )
 
     def test_filter_list(self):
         parser = flat_file.FlatFile('./tests/data/cookies.txt')
         parser.add_filters({'ip': ['X.X.X.X', 'A.A.A.A']})
         self.assertEquals([i for i in parser.get_results()], [{'block': '0',
-           'cscore0': '$UWA', 'id0': '42000227', 'ip': 'X.X.X.X', 'learning': '0', 'score0': '8',
+           'cscore0': '$UWA', 'id': '42000227', 'ip': 'X.X.X.X', 'learning': '0', 'score0': '8',
            'server': 'Y.Y.Y.Y', 'total_blocked': '204', 'total_processed': '472',
-           'uri': '/phpMyAdmin-2.8.2/scripts/setup.php', 'var_name0': 'cookie', 'vers': '0.52', 'zone0': 'HEADERS'}])
+           'uri': '/phpMyAdmin-2.8.2/scripts/setup.php', 'var_name': 'cookie', 'vers': '0.52', 'zone': 'HEADERS'}])
 
         parser = flat_file.FlatFile('./tests/data/cookies.txt')
         parser.add_filters({'ip': ['A.A.A.A']})
