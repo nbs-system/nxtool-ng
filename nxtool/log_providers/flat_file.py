@@ -52,14 +52,10 @@ class FlatFile(LogProvider):
             if error:
                 logging.error('%s while parsing %s', error, line)
             if log:
-                self.logs.append(log)
+                self.logs.extend(log)
 
     def get_top(self, field, size=250):
         ret = dict()
-        if field == 'zone':
-            field = 'zone0'
-        elif field == 'id':
-            field = 'id0'
         values = (log[field] for log in self.__get_filtered_logs())
         for key, value in collections.Counter(values).most_common(10):
             ret[key] = value
