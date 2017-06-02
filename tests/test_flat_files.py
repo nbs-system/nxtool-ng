@@ -158,7 +158,8 @@ class TestFiltering(unittest.TestCase):
         self.assertEquals([i for i in parser.get_results()][0], {'block': '0',
            'cscore0': '$UWA', 'id': '42000227', 'ip': 'X.X.X.X', 'learning': '0', 'score0': '8',
            'server': 'Y.Y.Y.Y', 'total_blocked': '204', 'total_processed': '472',
-           'uri': '/phpMyAdmin-2.8.2/scripts/setup.php', 'var_name': 'cookie', 'vers': '0.52', 'zone': 'HEADERS'}
+           'uri': '/phpMyAdmin-2.8.2/scripts/setup.php', 'var_name': 'cookie', 'vers': '0.52', 'zone': 'HEADERS',
+           'coords': None, 'date': '20131110T07:36:19'}
         )
 
     def test_filter_list(self):
@@ -167,7 +168,8 @@ class TestFiltering(unittest.TestCase):
         self.assertEquals([i for i in parser.get_results()], [{'block': '0',
            'cscore0': '$UWA', 'id': '42000227', 'ip': 'X.X.X.X', 'learning': '0', 'score0': '8',
            'server': 'Y.Y.Y.Y', 'total_blocked': '204', 'total_processed': '472',
-           'uri': '/phpMyAdmin-2.8.2/scripts/setup.php', 'var_name': 'cookie', 'vers': '0.52', 'zone': 'HEADERS'}])
+           'uri': '/phpMyAdmin-2.8.2/scripts/setup.php', 'var_name': 'cookie', 'vers': '0.52', 'zone': 'HEADERS',
+           'coords': None, 'date': '20131110T07:36:19'}])
 
         parser = flat_file.FlatFile('./tests/data/cookies.txt')
         parser.add_filters({'ip': ['A.A.A.A']})
