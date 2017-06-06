@@ -1,2 +1,2 @@
 elasticsearch-dsl>=2.0.0,<3.0.0
--e git+http://github.com/nbs-system/nxapi-ng/@fix_tests#egg=nxapi
+-e git+http://github.com/nbs-system/nxapi-ng/#egg=nxapi
