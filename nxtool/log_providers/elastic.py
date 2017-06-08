@@ -181,18 +181,16 @@ class Elastic(LogProvider):
         count = 0
         full_body = ""
         items = []
-        for entries in self.nlist:
-            for entry in entries:
-                items.append({"index" : {
-                    "_index": self.index,
-                    "_type" : "events",
-                    "_id"   : hashlib.sha512(json.dumps(entry)).hexdigest()}})
-                entry['whitelisted'] = "false"
-                entry['comments'] = "import:"+str(datetime.datetime.now())
-                # go utf-8 ?
-                for x in entry.keys():
-                    if isinstance(entry[x], basestring):
-                        entry[x] = unicode(entry[x], errors='replace')
+        for entry in self.nlist:
+            items.append({"index" : {
+                "_index": self.index,
+                "_type" : "events"}})
+            entry['whitelisted'] = "false"
+            entry['comments'] = "import:"+str(datetime.datetime.now())
+            # go utf-8 ?
+            for x in entry.keys():
+                if isinstance(entry[x], basestring):
+                    entry[x] = unicode(entry[x], errors='replace')
                 items.append(entry)
             count += 1
         self.client.bulk(body=items)

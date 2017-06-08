@@ -50,7 +50,7 @@ class LogProvider(object):
         :param obj: object to add to this instance
         :return bool: Success ?
         """
-        self.nList.extend(obj)
+        self.nlist.extend(obj)
         if self.auto_commit > 0 and len(self.nlist) > self.auto_commit:
             return self.commit()
         return True
