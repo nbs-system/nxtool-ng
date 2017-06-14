@@ -19,8 +19,8 @@ try:
 except ImportError:  # python3
     from configparser import ConfigParser
 
-from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
+from elasticsearch_dsl.connections import connections
 
 from nxtool.log_providers import LogProvider
 
@@ -51,7 +51,7 @@ class Elastic(LogProvider):
         host = config.get('elastic', 'host')
         self.doc_type = config.get('elastic', 'doc_type')
         
-        self.client = Elasticsearch([host, ], use_ssl=use_ssl, index=self.index, version=self.version, timeout=30, retry_on_timeout=True )
+        self.client = connections.create_connection(hosts=[host], use_ssl=use_ssl, index=self.index, version=self.version, timeout=30, retry_on_timeout=True )
         self.initialize_search()
 
     def initialize_search(self):
@@ -191,9 +191,14 @@ class Elastic(LogProvider):
             for x in entry.keys():
                 if isinstance(entry[x], basestring):
                     entry[x] = unicode(entry[x], errors='replace')
-                items.append(entry)
+            items.append(entry)
             count += 1
-        self.client.bulk(body=items)
+        try:
+            self.client.bulk(body=items)
+        except TransportError:
+            for meta, item in zip(items[0::2], items[1::2]): #We build tuples in items (items[0], items[1]), (items[2], items[3]) ...
+                self.client.bulk(body=[meta, item])
+
         self.total_commits += count
         logging.debug("Written "+str(self.total_commits)+" events")
         del self.nlist[0:len(self.nlist)]
