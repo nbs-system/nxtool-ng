@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import unicode_literals
 import logging
 import operator
 import collections
@@ -188,9 +189,6 @@ class Elastic(LogProvider):
             entry['whitelisted'] = "false"
             entry['comments'] = "import:"+str(datetime.datetime.now())
             # go utf-8 ?
-            for x in entry.keys():
-                if isinstance(entry[x], basestring):
-                    entry[x] = unicode(entry[x], errors='replace')
             items.append(entry)
             count += 1
         try:
