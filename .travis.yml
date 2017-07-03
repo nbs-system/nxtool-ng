@@ -1,6 +1,6 @@
+language: python
 dist: trusty
 sudo: false
-language: python
 
 cache: pip
 
@@ -41,10 +41,10 @@ script:
       pip install  "elasticsearch-dsl>=5.0.0,<6.0.0" || travis_terminate 1
       ;;
     2.4.5)
-      pip install  "elasticsearch>=2.0.0,<3.0.0" || travis_terminate 1
+      pip install  "elasticsearch-dsl>=2.0.0,<3.0.0" || travis_terminate 1
       ;;
     1.7.6)
-      pip install  "elasticsearch>=1.0.0,<2.0.0"|| travis_terminate 1
+      pip install  "elasticsearch-dsl<2.0.0"|| travis_terminate 1
       ;;
     *)
       travis_terminate 1

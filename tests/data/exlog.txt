@@ -2,4 +2,4 @@
 2013/05/30 20:47:05 [debug] 10804#0:*1 NAXSI_EXLOG: ip=127.0.0.1&server=127.0.0.1&uri=/&id=1302&zone=ARGS&var_name=&content=1234
 2013/05/30 20:47:05 [debug] 10804#0:*1 NAXSI_EXLOG: ip=127.0.0.1&server=127.0.0.1&uri=/&id=1302&zone=ARGS|NAME&var_name=abc&content=1234
 garbage line for teh lulz
-2013/11/10 07:36:19 [error] 8278#0: *5932 NAXSI_FMT: ip=X.X.X.X&server=1.2.3.4&uri=/phpMyAdmin-2.8.2/scripts/setup.php&learning=0&vers=0.52&total_processed=472&total_blocked=204&block=0&cscore0=$UWA&score0=8&zone0=HEADERS&id0=42000227&var_name0=user-agent, client: X.X.X.X, server: blog.memze.ro, request: "GET /phpMyAdmin-2.8.2/scripts/setup.php HTTP/1.1", host: "X.X.X.X"
+2013/11/10 07:36:19 [error] 8278#0: *5932 NAXSI_FMT: ip=127.0.0.1&server=1.2.3.4&uri=/phpMyAdmin-2.8.2/scripts/setup.php&learning=0&vers=0.52&total_processed=472&total_blocked=204&block=0&cscore0=$UWA&score0=8&zone0=HEADERS&id0=42000227&var_name0=user-agent, client: X.X.X.X, server: blog.memze.ro, request: "GET /phpMyAdmin-2.8.2/scripts/setup.php HTTP/1.1", host: "X.X.X.X"

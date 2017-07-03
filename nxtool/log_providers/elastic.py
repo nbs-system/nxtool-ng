@@ -3,11 +3,7 @@ from __future__ import unicode_literals
 import logging
 import operator
 import collections
-import hashlib
-import json
 import datetime
-
-from functools import partial
 
 try:  # Fuck you guido for removing reduce
     # noinspection PyUnresolvedReferences
@@ -20,10 +16,36 @@ try:
 except ImportError:  # python3
     from configparser import ConfigParser
 
+from elasticsearch import TransportError
 from elasticsearch_dsl import Search, Q
+from elasticsearch_dsl import DocType, Date, Boolean, String, Integer, Ip, GeoPoint
 from elasticsearch_dsl.connections import connections
 
 from nxtool.log_providers import LogProvider
+
+class Event(DocType):
+    ip = Ip()
+    server = String()
+    learning = Boolean()
+    vers = String()
+    total_processed = Integer()
+    total_blocked = Integer()
+    blocked = Boolean()
+    cscore0 = String()
+    score0 = Integer()
+    zone = String()
+    id = Integer()
+    var_name = String()
+    date = Date()
+    whitelisted = Boolean()
+    comments = String()
+    coords = GeoPoint()
+
+    class Meta:
+        doc_type = 'events'
+        ## ToDo change the hardcoded events used when saved is used
+        ## elasticsearch_dsl issue 689
+
 
 
 class Elastic(LogProvider):
@@ -32,8 +54,6 @@ class Elastic(LogProvider):
 
         self.percentage=10.0
         self.minimum_occurrences=250
-        
-        config = ConfigParser({'host': '127.0.0.1', 'use_ssl': True, 'index': 'nxapi', 'version': 2})
 
 # The ConfigParser documentation points out that there's no way to force defaults config option
 # outside the "DEFAULT" section.
@@ -51,12 +71,13 @@ class Elastic(LogProvider):
         use_ssl = config.getboolean('elastic', 'use_ssl')
         host = config.get('elastic', 'host')
         self.doc_type = config.get('elastic', 'doc_type')
-        
-        self.client = connections.create_connection(hosts=[host], use_ssl=use_ssl, index=self.index, version=self.version, timeout=30, retry_on_timeout=True )
+        self.client = connections.create_connection(hosts=[host], use_ssl=use_ssl, index=self.index, version=self.version, doc_type=self.doc_type, timeout=30, retry_on_timeout=True )
+
+        Event.init(index=self.index)
         self.initialize_search()
 
     def initialize_search(self):
-        self.search = Search(using=self.client, index=self.index, doc_type=self.doc_type).extra(size=10000)
+        self.search = Search(using=self.client, index=self.index).extra(size=10000)
         
     def export_search(self):
         return self.search
@@ -130,7 +151,7 @@ class Elastic(LogProvider):
 
         ret = set()
         search = self.search
-        ids = set(int(i['id']) for i in self.search.execute())  # get all possible ID
+        ids = set(i['id'] for i in self.search.execute())  # get all possible ID
         self.search = search
 
         for _id in ids:
@@ -164,7 +185,7 @@ class Elastic(LogProvider):
         return ret
 
     def reset_filters(self):
-        self.search = Search(using=self.client, index=self.index, doc_type=self.doc_type).extra(size=10000)
+        self.search = Search(using=self.client, index=self.index).extra(size=10000)
 
     def get_results(self):
         """
@@ -180,23 +201,36 @@ class Elastic(LogProvider):
         """Process list of dict (yes) and push them to DB """
         self.total_objs += len(self.nlist)
         count = 0
-        full_body = ""
-        items = []
-        for entry in self.nlist:
-            items.append({"index" : {
-                "_index": self.index,
-                "_type" : "events"}})
-            entry['whitelisted'] = "false"
-            entry['comments'] = "import:"+str(datetime.datetime.now())
-            # go utf-8 ?
-            items.append(entry)
-            count += 1
-        try:
-            self.client.bulk(body=items)
-        except TransportError:
-            for meta, item in zip(items[0::2], items[1::2]): #We build tuples in items (items[0], items[1]), (items[2], items[3]) ...
-                self.client.bulk(body=[meta, item])
 
+        def gen_events(events):
+            dicts = list()
+            for d in events:
+                dicts.extend([{'index': {'_index': 'nxapi', '_type': 'events'}}, d.to_dict()])
+                yield dicts.pop(-2)
+                yield dicts.pop(-1)
+
+
+        events = list()
+        for entry in self.nlist:
+            event = Event(_index=self.index)
+            for key, value in entry.items():
+                setattr(event, key, value)
+
+            event.whitelisted = False
+            event.comments = "import on"+str(datetime.datetime.now())
+            events.append(event)
+            count += 1
+
+        try:
+            ret = self.client.bulk(gen_events(events))
+            ## ToDo parse ret to selectively loop over events to events.save() whatever happens
+        except TransportError as e:
+            logging.warning("We encountered an error trying to continue.")
+            for event in events:
+                event.save(using=self.client)
+                ## ToDo find a way to change the hardcoded 'events' for ES doctype
+                ## elasticsearch_dsl Issue 689
+               
         self.total_commits += count
         logging.debug("Written "+str(self.total_commits)+" events")
         del self.nlist[0:len(self.nlist)]
