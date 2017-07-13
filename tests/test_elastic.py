@@ -72,9 +72,11 @@ class TestElastic(unittest.TestCase):
 
 
 class TestElasticImport(unittest.TestCase):
+
+
     def test_elastic_import(self):
-        source = flat_file.FlatFile('./tests/data/exlog.txt')
         dest = elastic.Elastic()
+        source = flat_file.FlatFile('./tests/data/exlog.txt')
         for log in source.logs:
             dest.insert([log])
         dest.stop()
@@ -83,3 +85,8 @@ class TestElasticImport(unittest.TestCase):
         dest.percentage = 0
         time.sleep(5)
         self.assertEqual(dest.get_relevant_ids(['id']), {u'1302', u'42000227'})
+        self.assertEqual(dest.get_top('id'), {1302: 3, 42000227: 1})
+        self.assertEqual(dest.get_top('uri'),{u'/': 3, u'/phpMyAdmin-2.8.2/scripts/setup.php': 1})
+        dest.client.indices.delete(index=dest.index, ignore=[400, 404])
+
+

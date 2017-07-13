@@ -18,28 +18,39 @@ except ImportError:  # python3
 
 from elasticsearch import TransportError
 from elasticsearch_dsl import Search, Q
-from elasticsearch_dsl import DocType, Date, Boolean, String, Integer, Ip, GeoPoint
+from elasticsearch_dsl import DocType, Date, Boolean, Integer, Ip, GeoPoint
+from elasticsearch_dsl import Index, VERSION
 from elasticsearch_dsl.connections import connections
+
+try:
+    from elasticsearch_dsl import Text, Keyword
+except ImportError:  # oldversion of Elasticsearch
+    from elasticsearch_dsl import String
+    Text = String
+    Keyword = String
+
 
 from nxtool.log_providers import LogProvider
 
 class Event(DocType):
     ip = Ip()
-    server = String()
+    coords = GeoPoint()
     learning = Boolean()
-    vers = String()
     total_processed = Integer()
     total_blocked = Integer()
     blocked = Boolean()
-    cscore0 = String()
+    cscore0 = Keyword()
     score0 = Integer()
-    zone = String()
+    zone = Keyword()
     id = Integer()
-    var_name = String()
+    var_name = Keyword()
     date = Date()
     whitelisted = Boolean()
-    comments = String()
-    coords = GeoPoint()
+    uri = Text(fields={'raw': Keyword(index = 'not_analyzed')})
+    server = Text(fields={'raw': Keyword(index = 'not_analyzed')})
+    comments = Text(fields={'raw': Keyword(index = 'not_analyzed')})
+    vers = Text(fields={'raw': Keyword(index = 'not_analyzed')})
+
 
     class Meta:
         doc_type = 'events'
@@ -74,6 +85,8 @@ class Elastic(LogProvider):
         self.client = connections.create_connection(hosts=[host], use_ssl=use_ssl, index=self.index, version=self.version, doc_type=self.doc_type, timeout=30, retry_on_timeout=True )
 
         Event.init(index=self.index)
+        index = Index(self.index, using=self.client)
+        index.doc_type(Event)
         self.initialize_search()
 
     def initialize_search(self):
@@ -131,7 +144,16 @@ class Elastic(LogProvider):
         """
         search = self.search
         ret = dict()
-        self.search = self.search.params(search_type="count")
+
+        if field in ['uri', 'vers', 'comments', 'server']:
+            field = ''.join((field, '.raw'))
+
+        if VERSION < (5, 0, 0):
+            self.search = self.search.params(search_type='count', default_operator='AND')
+        else:
+            self.search = self.search.params(search_type='query_then_fetch')
+        # This documented at https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+        # search_type='count' has been deprecated in ES 2.0
         self.search.aggs.bucket('TEST', 'terms', field=field)
         for hit in self.search.execute(ignore_cache=True).aggregations['TEST']['buckets']:
             ret[hit['key']] = hit['doc_count']

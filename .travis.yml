@@ -38,19 +38,18 @@ install:
 script:
   - 'case "${ES_VERSION}" in
     5.4.1|5.3.3)
-      pip install  "elasticsearch-dsl>=5.0.0,<6.0.0" || travis_terminate 1
+      pip install -r requirements-v5.txt || travis_terminate 1
       ;;
     2.4.5)
-      pip install  "elasticsearch-dsl>=2.0.0,<3.0.0" || travis_terminate 1
+      pip install -r requirements-v2.txt || travis_terminate 1
       ;;
     1.7.6)
-      pip install  "elasticsearch-dsl<2.0.0"|| travis_terminate 1
+      pip install -r requirements-v1.txt || travis_terminate 1
       ;;
     *)
       travis_terminate 1
       ;;
     esac'
-  - pip install -r requirements.txt
   - pip install coveralls nose2 nose2-cov
   - coverage run --source=nxtool -m nose2.__main__ -v
 
