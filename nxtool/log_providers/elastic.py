@@ -65,7 +65,6 @@ class Elastic(LogProvider):
 
         self.percentage=10.0
         self.minimum_occurrences=250
-
 # The ConfigParser documentation points out that there's no way to force defaults config option
 # outside the "DEFAULT" section.
         config = ConfigParser()
@@ -158,6 +157,9 @@ class Elastic(LogProvider):
         for hit in self.search.execute(ignore_cache=True).aggregations['TEST']['buckets']:
             ret[hit['key']] = hit['doc_count']
         self.search = search
+
+        if field == 'uri.raw' and self.simplified_uri:
+            ret = self.simplify_uri(ret)
         return ret
 
     def get_relevant_ids(self, fields, percentage=0, minimum_occurrences=0):

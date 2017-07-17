@@ -70,7 +70,6 @@ class TestElastic(unittest.TestCase):
         parser.get_results()
         self.assertEqual(parser.get_filters(), filters)
 
-
 class TestElasticImport(unittest.TestCase):
 
 
@@ -86,7 +85,9 @@ class TestElasticImport(unittest.TestCase):
         time.sleep(5)
         self.assertEqual(dest.get_relevant_ids(['id']), {u'1302', u'42000227'})
         self.assertEqual(dest.get_top('id'), {1302: 3, 42000227: 1})
-        self.assertEqual(dest.get_top('uri'),{u'/': 3, u'/phpMyAdmin-2.8.2/scripts/setup.php': 1})
+        self.assertEqual(dest.get_top('uri'), {u'/': 3, u'/phpMyAdmin-2.8.2/scripts/setup.php': 1})
+        dest.simplified_uri = True
+        self.assertEqual(dest.get_top('uri'), {u'/': 3, u'/A-N.N.N/A/A.A': 1})
         dest.client.indices.delete(index=dest.index, ignore=[400, 404])
 
 

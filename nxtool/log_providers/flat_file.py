@@ -13,7 +13,7 @@ from nxtool.log_providers import LogProvider
 
 class FlatFile(LogProvider):
     def __init__(self, fname=None):
-        super(LogProvider, self)
+        super(FlatFile, self).__init__()
 
         self.minimum_occurrences = 250
         self.percentage = 10
@@ -59,6 +59,8 @@ class FlatFile(LogProvider):
         values = (log[field] for log in self.__get_filtered_logs())
         for key, value in collections.Counter(values).most_common(10):
             ret[key] = value
+        if field == 'uri' and self.simplified_uri:
+            ret = self.simplify_uri(ret)
         return ret
 
     def __get_filtered_logs(self):

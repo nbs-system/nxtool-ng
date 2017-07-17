@@ -87,6 +87,7 @@ def __create_argparser():
     actions.add_argument('--filter', action='store')
     actions.add_argument('--filter-regexp', action='store')
     actions.add_argument('--stats', action='store_true')
+    actions.add_argument('--simplify-uri', action='store_true')
 
     return parser.parse_args()
 
@@ -135,6 +136,8 @@ def main():
         for module in WL_MODULES:
             if args.slack:
                 source.minimum_occurences = 0
+            if args.simplify_uri:
+                source.simplified_uri = True
             rules = module.generate_whitelist(source, whitelist)
             whitelist.extend(rules)
             __whitelist_from_rules(source, rules)
