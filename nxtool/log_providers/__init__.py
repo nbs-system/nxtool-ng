@@ -1,4 +1,5 @@
-import re
+import re, collections
+
 class LogProvider(object):
     def __init__(self, auto_commit_limit=400):
         self.nlist = list()
@@ -68,14 +69,11 @@ class LogProvider(object):
         :param uri:
         :return:
         """
-        t = dict()
+        t = collections.defaultdict(int)
         for key, value in uri.items():
             new_key = re.sub('([a-zA-Z]+)', 'A', key)
             new_key = re.sub('([0-9]+)', 'N', new_key)
-            if new_key in t:
-                t[new_key] += value
-            else:
-                t[new_key] = value
+            t[new_key] += value
         return t
 
     def stop(self):
