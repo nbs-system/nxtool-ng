@@ -92,19 +92,31 @@ def regexify_uri(source, rules):
         source.minimum_occurences = 0
         source.percentage = 0
         uris = source.get_top('uri')
-        t = collections.defaultdict(basestring)
+        t = collections.defaultdict(list)
         for key in uris:
-            new_key = regexp_alphanum.sub(repl, key)
-            t[new_key] = regexp_alphanum.sub("P", key)
+            new_key = regexp_alphanum.sub("P", key)
+            t[new_key].append(regexp_alphanum.sub(repl, key))
         ## We might be in a case where a regex matched on a degenerated case
-        ## For example an alphanumeric string without [g-z] matching the hexa case
+        ## For example one instance of alphanumeric string without [g-z] matching the hexa case
+        ## We try to sort this out
+        for key, value in t.items():
+            if len(t[key]) > 1:
+                for i in t[key]:
+                    for regexp in REGEXPS_URI:
+                        index = 0
+                        if i in regexp:
+                            if REGEXPS_URI[regexp] > index and index not in [3, 4]:
+                                ## We have to disinguish between hexa and alphnum separatly
+                                index = REGEXPS_URI.index(regexp)
+            t[key] = REGEXPS_URI[index]
+            ## We can now be in the case of problem distinguishing between hexa and alphanum
 
         print "New T"
         for key, value in t.items():
             print("{}: {}".format(key, value))
-        for key in t:
+        for key, value in t.items():
             new_rule = rule.copy()
-            new_rule['mz'] = ["URL_X:{0}|{1}".format(key, rule['mz'][0])]
+            new_rule['mz'] = ["URL_X:{0}|{1}".format(value[0], rule['mz'][0])]
             new_rules.append(new_rule)
 
     return new_rules
