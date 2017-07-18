@@ -69,10 +69,16 @@ class LogProvider(object):
         :param uri:
         :return:
         """
+        def repl(mo):
+            if re.match('([a-zA-Z]+)', mo.string[mo.start():mo.end()]):
+                return 'A'
+            if re.match('([0-9]+)', mo.string[mo.start():mo.end()]):
+                return 'N'
+
         t = collections.defaultdict(int)
+        regex = re.compile("(%s)" % "|".join(['[a-zA-Z]+', '[0-9]+']))
         for key, value in uri.items():
-            new_key = re.sub('([a-zA-Z]+)', 'A', key)
-            new_key = re.sub('([0-9]+)', 'N', new_key)
+            new_key = regex.sub(repl, key)
             t[new_key] += value
         return t
 
