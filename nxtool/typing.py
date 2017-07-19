@@ -21,15 +21,7 @@ REGEXPS = [
     [r'', 'none'],  # untypables parameters
 ]
 
-REGEXPS_URI = [
-    [r'^$', 'empty'],
-    [r'^[01]$', 'boolean'],
-    [r'^\d+$', 'integer'],
-    [r'^[a-z]+$', 'string'],
-    [r'^[0-9a-f]+$', 'hexadecimal'],
-    [r'^[0-9a-z]+$', 'alphanum'],
-    [r'', 'none'],  # untypables parameters
-]
+REGEXPS_URI = [r'^$', r'[01]+', r'\d+', r'[a-f]+', r'[a-z]+', r'[0-9a-f]+', r'[0-9a-z]+', r'']
 
 def typification(source):
     # rules = {zone1: {var1:0, var2:0}, zone2: {var6:0, ...}, ...}
@@ -75,12 +67,13 @@ def regexify_uri(source, rules):
         """
 
     # Compile regexp for speed
-    regexps = [re.compile(reg, re.IGNORECASE) for reg, _ in REGEXPS_URI]
+    regexps = [re.compile(reg, re.IGNORECASE) for reg in REGEXPS_URI]
     regexp_alphanum = re.compile("([0-9a-zA-Z]+)")
 
     def repl(mo):
         for regexp in regexps:
             if regexp.match(mo.string[mo.start():mo.end()]):
+                uri_type.append(regexps.index(regexp))
                 return regexp.pattern
 
     new_rules = list()
@@ -93,30 +86,32 @@ def regexify_uri(source, rules):
         source.percentage = 0
         uris = source.get_top('uri')
         t = collections.defaultdict(list)
-        for key in uris:
-            new_key = regexp_alphanum.sub("P", key)
-            t[new_key].append(regexp_alphanum.sub(repl, key))
-        ## We might be in a case where a regex matched on a degenerated case
-        ## For example one instance of alphanumeric string without [g-z] matching the hexa case
-        ## We try to sort this out
-        for key, value in t.items():
-            if len(t[key]) > 1:
-                for i in t[key]:
-                    for regexp in REGEXPS_URI:
-                        index = 0
-                        if i in regexp:
-                            if REGEXPS_URI[regexp] > index and index not in [3, 4]:
-                                ## We have to disinguish between hexa and alphnum separatly
-                                index = REGEXPS_URI.index(regexp)
-            t[key] = REGEXPS_URI[index]
-            ## We can now be in the case of problem distinguishing between hexa and alphanum
+        for uri in uris:
+            new_key = regexp_alphanum.sub("P", uri)
+            t[new_key].append(uri)
+        ## t is now a dict of uri for example { 'P.P': ['aaa.aaa', 'aaa.aab'] }
+        sorted_t = dict()
 
-        print "New T"
-        for key, value in t.items():
-            print("{}: {}".format(key, value))
-        for key, value in t.items():
+        for key, values in t.items():
+            matched_list = list()
+            uri_types = list()
+            uri_type = list()
+            for value in values:
+                ## here value are single url
+                ## We check all url of the same type (key in our t dict) to find the better match
+                matched_list.append(regexp_alphanum.sub(repl, value))
+                uri_types.append(uri_type)
+
+            crossed_list = [[item[i] for item in uri_types] for i in range(len(uri_types[0]))]
+            best_crossed_list = [max(crossed_list[i]) for i in range(len(crossed_list))]
+            new_value = key
+            for i in best_crossed_list:
+                new_value = new_value.replace('P', REGEXPS_URI[i], 1)
+                sorted_t[key] = new_value
+
+        for key, value in sorted_t.items():
             new_rule = rule.copy()
-            new_rule['mz'] = ["URL_X:{0}|{1}".format(value[0], rule['mz'][0])]
+            new_rule['mz'] = ["URL_X:{0}|{1}".format(value, rule['mz'][0])]
             new_rules.append(new_rule)
 
     return new_rules

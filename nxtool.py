@@ -88,7 +88,7 @@ def __create_argparser():
     actions.add_argument('--filter-regexp', action='store')
     actions.add_argument('--stats', action='store_true')
     actions.add_argument('--simplify-uri', action='store_true')
-
+    actions.add_argument('--regixify-uri', action='store_true')
     return parser.parse_args()
 
 
@@ -124,6 +124,8 @@ def main():
     if args.filter_regexp:
         __filter(source, args.filter_regexp, regexp=True, hostname=args.hostname)
 
+    if args.simplify_uri and args.regixify_uri:
+        print('You asked for regixify-uri and simplify-uri but you cannot use them at the same time.')
     if args.elastic_dest:
         destination = elastic.Elastic()
         for log in source.logs:
@@ -136,9 +138,12 @@ def main():
         for module in WL_MODULES:
             if args.slack:
                 source.minimum_occurences = 0
+                source.percentage = 0
             if args.simplify_uri:
                 source.simplified_uri = True
             rules = module.generate_whitelist(source, whitelist)
+            if args.regexify_uri:
+                rules = typing.regexify_uri(source, rules)
             whitelist.extend(rules)
             __whitelist_from_rules(source, rules)
         if whitelist:
