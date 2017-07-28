@@ -1,2 +1,0 @@
-elasticsearch-dsl,<6.0.0
--e git+http://github.com/nbs-system/nxapi-ng/#egg=nxapi
