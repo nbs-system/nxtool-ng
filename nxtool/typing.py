@@ -102,7 +102,9 @@ def regexify_uri(source, rules):
                 matched_list.append(regexp_alphanum.sub(repl, value))
                 uri_types.append(uri_type)
 
-            crossed_list = [[item[i] for item in uri_types] for i in range(len(uri_types[0]))]
+#                ## TODO use zip for that
+#            crossed_list = [[item[i] for item in uri_types] for i in range(len(uri_types[0]))]
+            crossed_list = zip(*uri_types)
             best_crossed_list = [max(crossed_list[i]) for i in range(len(crossed_list))]
             new_value = key
             for i in best_crossed_list:
