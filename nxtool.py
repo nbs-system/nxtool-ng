@@ -75,7 +75,6 @@ def __create_argparser():
     log_sources.add_argument('--elastic-source', action='store_true')
     log_sources.add_argument('--flat-file', type=str)
     log_sources.add_argument('--stdin', action='store_true')
-    log_sources.add_argument('--archive', action='store_true')
 
     log_destinations = parser.add_argument_group('Log destinations')
     log_destinations.add_argument('--elastic-dest', action='store_true')
