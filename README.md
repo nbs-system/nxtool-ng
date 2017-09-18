@@ -59,23 +59,28 @@ optional arguments:
   -v, --verbose
 
 Log sources:
-  --elastic
+  --elastic-source
   --flat-file
   --stdin
-  --archive
 
 Actions:
   --typing
   --whitelist
+  --elastic-dest
   --filter FILTER
   --stats
   --slack
 ```
 
+First you can populate an elasticsearch instance by:
+```bash
+$ python nxtool.py --elastic-dest --flat-file example.com.log
+```
+
 For example, if you want some stats about `example.com` using your elasticsearch instance:
 
 ```bash
-$ python nxtool.py --elastic --stats example.com
+$ python nxtool.py --elastic-source --stats example.com
 2.39.218.24: 14
 14.76.8.132: 18
 13.24.13.122: 8
@@ -115,7 +120,7 @@ example.com: 536
 To generate some whitelists for `example.com`, using your elasticsearch instance:
 
 ```bash
-$ python nxtool.py --elastic --whitelist example.com
+$ python nxtool.py --elastic-source --whitelist example.com
 [+] Generating Google analytics rules
 [+] Generating Image 1002 rules
 [+] Generating cookies rules
@@ -139,7 +144,7 @@ You can also use nxtool-ng to query your elasticsearch instance, for example
 to search for access to `/admin`, that triggered the rule `1010` in the `HEADERS`:
 
 ```bash
-$ python nxtool.py --elastic --filter 'uri=/admin,zone=HEADERS,id=1010'
+$ python nxtool.py --elastic-source --filter 'uri=/admin,zone=HEADERS,id=1010'
 
 zone: HEADERS
 ip: 133.144.211.172
@@ -171,7 +176,7 @@ It's also possible to *type* your parameters, to tighten a bit the security of
 your application:
 
 ```
-$ python nxtool.py --elastic --typing --verbose example.com
+$ python nxtool.py --elastic-source --typing --verbose example.com
 
 Generated types:
 
@@ -179,3 +184,33 @@ BasicRule negative "rx:^$" "msg:empty" "mz:FILE_EXT:user_avatar" "s:BLOCK";
 BasicRule negative "rx:^$" "msg:empty" "mz:FILE_EXT:society_logo" "s:BLOCK";
 BasicRule negative "rx:^https?://([0-9a-z-.]+\.)+[\w?+-=&/ ]+$" "msg:url" "mz:ARGS:url" "s:BLOCK";
 ```
+
+# Note on the structure ElasticSearch entries
+
+Each core rule violation is logged in a NAXSI_FMT entry. Each violation is reported once in the ElasticSearch instance.
+Types in the used elasticsearch entries are enforced:
+
+```
+    ip = Ip
+    coords = GeoPoint
+    learning = Boolean
+    total_processed = Integer
+    total_blocked = Integer
+    blocked = Boolean
+    cscore0 = Keyword
+    score0 = Integer
+    zone = Keyword
+    id = Integer
+    var_name = Keyword
+    date = Date
+    whitelisted = Boolean
+    uri = Text
+    server = Text
+    comments = Text
+    vers = Text
+```
+First term is the key used in NAXSI_FMT and second term is the defined ElasticSearch type. Text is used as a backward
+compatible version of Keyword. We may drop the support of old elasticsearch version in the near future and replace
+Text with Keyword.
+
+It is noteworthy that one request might violate multiple core rule and lead to multiple entries in ElasticSearch.
