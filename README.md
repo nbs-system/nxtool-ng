@@ -185,7 +185,7 @@ BasicRule negative "rx:^$" "msg:empty" "mz:FILE_EXT:society_logo" "s:BLOCK";
 BasicRule negative "rx:^https?://([0-9a-z-.]+\.)+[\w?+-=&/ ]+$" "msg:url" "mz:ARGS:url" "s:BLOCK";
 ```
 
-# Note on the structure ElasticSearch entries
+# Note on the structure of ElasticSearch entries
 
 Each core rule violation is logged in a NAXSI_FMT entry. Each violation is reported once in the ElasticSearch instance.
 Types in the used elasticsearch entries are enforced:
