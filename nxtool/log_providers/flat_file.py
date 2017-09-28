@@ -118,7 +118,7 @@ class FlatFile(LogProvider):
         :param list of str fields:
         :return:
         """
-        minimum_occurences = minimum_occurrences or self.minimum_occurrences
+        minimum_occurrences = minimum_occurrences or self.minimum_occurrences
         percentage = percentage or self.percentage
         
         id_blacklist = set()
@@ -135,7 +135,7 @@ class FlatFile(LogProvider):
                 if size < minimum_occurrences:
                     logging.debug('The field %s has not enough occurrences (%d): non-significant', field, size)
                     continue
-                if v < size / percentage:
+                if 100 * v < size * percentage:
                     logging.debug('The id %s is present in less than 10%% (%d) of %s : non-significant.', k, v, field)
                     id_blacklist.add(k)
                 else:
